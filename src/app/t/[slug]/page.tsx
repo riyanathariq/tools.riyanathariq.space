@@ -15,10 +15,21 @@ function ToolLoader({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!tool) return;
+    let cancelled = false;
     pushRecentToolSlug(slug);
     loadToolComponent(slug)
-      .then(setComponent)
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load tool"));
+      // Wrap in updater factory — React treats bare function args as setState updaters.
+      .then((Comp) => {
+        if (!cancelled) setComponent(() => Comp);
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load tool");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [slug, tool]);
 
   if (!tool) {
