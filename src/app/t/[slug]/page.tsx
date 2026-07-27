@@ -10,17 +10,19 @@ import { loadToolComponent } from "@/tools/load-tool";
 
 function ToolLoader({ slug }: { slug: string }) {
   const tool = getToolBySlug(slug);
-  const [Component, setComponent] = useState<ComponentType | null>(null);
+  // Store component inside an object so setState never treats it as an updater fn.
+  const [loaded, setLoaded] = useState<{ Comp: ComponentType } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!tool) return;
     let cancelled = false;
+    setLoaded(null);
+    setError(null);
     pushRecentToolSlug(slug);
     loadToolComponent(slug)
-      // Wrap in updater factory — React treats bare function args as setState updaters.
       .then((Comp) => {
-        if (!cancelled) setComponent(() => Comp);
+        if (!cancelled) setLoaded({ Comp });
       })
       .catch((e) => {
         if (!cancelled) {
@@ -44,7 +46,7 @@ function ToolLoader({ slug }: { slug: string }) {
     );
   }
 
-  if (!Component) {
+  if (!loaded) {
     return (
       <div className="flex min-h-[20rem] items-center justify-center">
         <p className="animate-pulse text-sm text-zinc-500">Loading tool…</p>
@@ -52,7 +54,8 @@ function ToolLoader({ slug }: { slug: string }) {
     );
   }
 
-  return <Component />;
+  const { Comp } = loaded;
+  return <Comp />;
 }
 
 function ToolPageInner({ slug }: { slug: string }) {
@@ -69,6 +72,16 @@ function ToolPageInner({ slug }: { slug: string }) {
 export default function ToolPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
+
+  if (!slug) {
+    return (
+      <ToolsShell title="Loading…">
+        <div className="flex min-h-[20rem] items-center justify-center">
+          <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
+        </div>
+      </ToolsShell>
+    );
+  }
 
   return (
     <Suspense
