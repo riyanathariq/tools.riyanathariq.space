@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 
-import { toolsRegistry, searchTools } from "@/data/tools-registry";
+import { searchTools } from "@/data/tools-registry";
 import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ const categoryOrder: ToolCategory[] = [
 
 export function ToolsSidebar({
   activeSlug,
-  open,
+  open: _open,
   onClose,
 }: {
   activeSlug?: string;
@@ -30,10 +30,15 @@ export function ToolsSidebar({
 }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  void _open;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "/" && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
+      if (
+        e.key === "/" &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement)
+      ) {
         e.preventDefault();
         inputRef.current?.focus();
       }
@@ -56,7 +61,7 @@ export function ToolsSidebar({
   return (
     <aside
       className={cn(
-        "flex h-full w-[min(100vw,20rem)] flex-col border-r border-zinc-800/80 bg-zinc-950/95 backdrop-blur-xl",
+        "flex h-full w-[min(100vw,20rem)] flex-col border-r border-zinc-800/80 bg-zinc-950",
         "lg:w-72",
       )}
     >
@@ -64,9 +69,6 @@ export function ToolsSidebar({
         <Link href="/" className="group min-w-0" onClick={onClose}>
           <p className="truncate text-sm font-semibold tracking-tight text-zinc-50">
             tools<span className="text-emerald-400">.riyanathariq</span>
-          </p>
-          <p className="truncate text-[11px] text-zinc-500">
-            {toolsRegistry.length} developer utilities
           </p>
         </Link>
         <button
@@ -127,7 +129,7 @@ export function ToolsSidebar({
         ) : null}
       </nav>
 
-      <div className="border-t border-zinc-800/80 p-3 text-xs text-zinc-600">
+      <div className="border-t border-zinc-800/80 p-3 text-xs text-zinc-500">
         <a
           href="https://riyanathariq.space"
           className="hover:text-emerald-400"
@@ -136,8 +138,6 @@ export function ToolsSidebar({
         >
           riyanathariq.space
         </a>
-        {" · "}
-        runs locally in your browser
       </div>
     </aside>
   );

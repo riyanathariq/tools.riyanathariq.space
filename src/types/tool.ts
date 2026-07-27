@@ -15,6 +15,8 @@ export interface ToolMeta {
   description: string;
   category: ToolCategory;
   keywords: string[];
+  /** Short help shown in the tool header (i) popover. */
+  info: string;
 }
 
 export type ToolComponent = ComponentType;

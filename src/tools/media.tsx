@@ -1,18 +1,20 @@
 "use client";
 
 import QRCode from "qrcode";
-import { useCallback, useEffect, useState } from "react";
+import { Download, Upload } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  ClearButton,
   CopyButton,
   Panel,
-  TextIO,
   ToolHeader,
 } from "@/components/tool-workspace";
-import { downloadBlob } from "@/lib/utils";
+import { getToolBySlug } from "@/data/tools-registry";
+import { cn, downloadBlob } from "@/lib/utils";
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const m = hex.replace(/^#/, "").match(/^([0-9a-f]{3}|[0-9a-f]{6})$/i);
@@ -66,20 +68,99 @@ function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: n
   };
 }
 
+function CopyChip({ label, value }: { label: string; value: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => void navigator.clipboard.writeText(value)}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 font-mono text-xs text-zinc-200 transition-colors hover:border-emerald-500/50 hover:bg-zinc-900"
+      title={`Copy ${label}`}
+    >
+      <span className="text-zinc-500">{label}</span>
+      {value}
+    </button>
+  );
+}
+
+function ImageDropzone({
+  onFile,
+  hasFile,
+}: {
+  onFile: (file: File) => void;
+  hasFile: boolean;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  const pick = useCallback(
+    (file: File | null | undefined) => {
+      if (!file || !file.type.startsWith("image/")) return;
+      onFile(file);
+    },
+    [onFile],
+  );
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        pick(e.dataTransfer.files?.[0]);
+      }}
+      onClick={() => inputRef.current?.click()}
+      className={cn(
+        "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-8 text-center transition-colors",
+        dragOver
+          ? "border-emerald-500/60 bg-emerald-500/5"
+          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+      )}
+    >
+      <Upload className="size-8 text-zinc-500" />
+      <p className="text-sm text-zinc-300">{hasFile ? "Replace image" : "Upload Image"}</p>
+      <p className="text-xs text-zinc-500">Drop an image here or click to browse</p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={(e) => pick(e.target.files?.[0])}
+      />
+    </div>
+  );
+}
+
 export function imageConverter() {
+  const meta = getToolBySlug("image-converter");
   const [preview, setPreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [format, setFormat] = useState<"image/png" | "image/jpeg" | "image/webp">("image/png");
   const [quality, setQuality] = useState(0.92);
   const [maxWidth, setMaxWidth] = useState(1200);
   const [error, setError] = useState<string | null>(null);
 
-  const onFile = useCallback((file: File | null) => {
+  const onFile = useCallback((file: File) => {
     setError(null);
-    if (!file) return;
+    setFileName(file.name);
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.onerror = () => setError("Failed to read file");
     reader.readAsDataURL(file);
+  }, []);
+
+  const clear = useCallback(() => {
+    setPreview(null);
+    setFileName(null);
+    setError(null);
   }, []);
 
   const convert = useCallback(async () => {
@@ -113,41 +194,64 @@ export function imageConverter() {
 
   return (
     <>
-      <ToolHeader name="Image Converter" description="Convert and resize images in your browser." />
+      <ToolHeader
+        name={meta?.name ?? "Image Converter"}
+        description={meta?.description ?? "Convert and resize images in your browser."}
+        slug="image-converter"
+      />
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
-          <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0] ?? null)} className="text-sm text-zinc-300" />
-          {(["image/png", "image/jpeg", "image/webp"] as const).map((f) => (
-            <Button key={f} type="button" variant={format === f ? "primary" : "outline"} onClick={() => setFormat(f)}>
-              {f.split("/")[1].toUpperCase()}
-            </Button>
-          ))}
-          <label className="text-sm text-zinc-400">
-            Quality
-            <Input type="number" min={0.1} max={1} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="ml-2 inline-block w-20" />
-          </label>
-          <label className="text-sm text-zinc-400">
-            Max width
-            <Input type="number" min={100} max={4000} value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="ml-2 inline-block w-24" />
-          </label>
-          <Button type="button" onClick={convert} disabled={!preview}>
-            Download converted
-          </Button>
-        </div>
-        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+        <ImageDropzone onFile={onFile} hasFile={!!preview} />
+
         {preview ? (
-          <Panel title="Preview">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Preview" className="max-h-96 max-w-full rounded-xl" />
-          </Panel>
+          <div className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="truncate text-sm text-zinc-300">
+                <span className="text-zinc-500">File: </span>
+                {fileName}
+              </p>
+              <ClearButton onClick={clear} />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {(["image/png", "image/jpeg", "image/webp"] as const).map((f) => (
+                <Button key={f} type="button" variant={format === f ? "primary" : "outline"} onClick={() => setFormat(f)}>
+                  {f.split("/")[1].toUpperCase()}
+                </Button>
+              ))}
+              <label className="text-sm text-zinc-400">
+                Quality
+                <Input type="number" min={0.1} max={1} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="ml-2 inline-block w-20" />
+              </label>
+              <label className="text-sm text-zinc-400">
+                Max width
+                <Input type="number" min={100} max={4000} value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="ml-2 inline-block w-24" />
+              </label>
+              <Button type="button" onClick={convert}>
+                <Download className="size-4" />
+                Download converted
+              </Button>
+            </div>
+
+            <Panel title="Preview">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={preview} alt="Preview" className="max-h-48 max-w-full rounded-xl border border-zinc-800" />
+            </Panel>
+          </div>
         ) : null}
+
+        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
       </div>
     </>
   );
 }
 
+type EccLevel = "L" | "M" | "Q" | "H";
+
 export function qrCode() {
+  const meta = getToolBySlug("qr-code");
   const [text, setText] = useState("https://riyanathariq.space");
+  const [size, setSize] = useState(280);
+  const [ecc, setEcc] = useState<EccLevel>("M");
   const [dataUrl, setDataUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -156,22 +260,55 @@ export function qrCode() {
       setDataUrl("");
       return;
     }
-    QRCode.toDataURL(text, { margin: 2, width: 280 })
+    QRCode.toDataURL(text, { margin: 2, width: size, errorCorrectionLevel: ecc })
       .then(setDataUrl)
       .catch((e) => {
         setError(e instanceof Error ? e.message : "QR generation failed");
         setDataUrl("");
       });
-  }, [text]);
+  }, [text, size, ecc]);
+
+  const downloadQr = useCallback(() => {
+    if (!dataUrl) return;
+    fetch(dataUrl)
+      .then((r) => r.blob())
+      .then((blob) => downloadBlob("qrcode.png", blob));
+  }, [dataUrl]);
 
   return (
     <>
-      <ToolHeader name="QR Code" description="Generate QR codes from text or URLs." />
+      <ToolHeader
+        name={meta?.name ?? "QR Code"}
+        description={meta?.description ?? "Generate QR codes from text or URLs."}
+        slug="qr-code"
+      />
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <label className="text-sm text-zinc-400">
+          Size
+          <Input type="number" min={128} max={1024} step={8} value={size} onChange={(e) => setSize(Number(e.target.value))} className="ml-2 inline-block w-24" />
+        </label>
+        <span className="text-sm text-zinc-500">ECC</span>
+        {(["L", "M", "Q", "H"] as const).map((level) => (
+          <Button key={level} type="button" variant={ecc === level ? "primary" : "outline"} onClick={() => setEcc(level)}>
+            {level}
+          </Button>
+        ))}
+      </div>
       <div className="grid gap-3 lg:grid-cols-2">
         <Panel title="Text / URL">
-          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem] border-0 bg-transparent p-0 focus:ring-0" />
+          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem] border-0 bg-zinc-950 p-0 focus:ring-0" />
         </Panel>
-        <Panel title="QR Code">
+        <Panel
+          title="QR Code"
+          actions={
+            dataUrl ? (
+              <Button type="button" variant="ghost" className="h-9 min-h-9 px-2.5" onClick={downloadQr}>
+                <Download className="size-4" />
+                <span className="sr-only sm:not-sr-only sm:inline">Download</span>
+              </Button>
+            ) : undefined
+          }
+        >
           {error ? <p className="text-sm text-rose-400">{error}</p> : null}
           {dataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -186,6 +323,7 @@ export function qrCode() {
 }
 
 export function colorPicker() {
+  const meta = getToolBySlug("color-picker");
   const [hex, setHex] = useState("#10b981");
   const [rgb, setRgb] = useState({ r: 16, g: 185, b: 129 });
   const [hsl, setHsl] = useState({ h: 160, s: 84, l: 39 });
@@ -218,18 +356,33 @@ export function colorPicker() {
     setError(null);
   };
 
+  const rgbStr = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  const hslStr = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
   return (
     <>
-      <ToolHeader name="Color Picker" description="Convert between HEX, RGB, and HSL." />
+      <ToolHeader
+        name={meta?.name ?? "Color Picker"}
+        description={meta?.description ?? "Convert between HEX, RGB, and HSL."}
+        slug="color-picker"
+      />
       <div className="flex flex-col gap-3">
         <div
-          className="h-24 rounded-2xl border border-zinc-800"
+          className="h-24 rounded-2xl border border-zinc-800 bg-zinc-950"
           style={{ backgroundColor: hex }}
         />
+        <div className="flex flex-wrap gap-2">
+          <CopyChip label="HEX" value={hex} />
+          <CopyChip label="RGB" value={rgbStr} />
+          <CopyChip label="HSL" value={hslStr} />
+        </div>
         {error ? <p className="text-sm text-rose-400">{error}</p> : null}
         <div className="grid gap-3 sm:grid-cols-3">
           <Panel title="HEX">
-            <Input value={hex} onChange={(e) => syncFromHex(e.target.value)} className="font-mono" />
+            <div className="flex items-center gap-2">
+              <Input value={hex} onChange={(e) => syncFromHex(e.target.value)} className="font-mono" />
+              <CopyButton value={hex} />
+            </div>
           </Panel>
           <Panel title="RGB">
             <div className="flex gap-2">
@@ -254,7 +407,7 @@ export function colorPicker() {
             </div>
           </Panel>
         </div>
-        <input type="color" value={hex} onChange={(e) => syncFromHex(e.target.value)} className="h-11 w-full cursor-pointer rounded-xl" />
+        <input type="color" value={hex} onChange={(e) => syncFromHex(e.target.value)} className="h-11 w-full cursor-pointer rounded-xl border border-zinc-800 bg-zinc-950" />
       </div>
     </>
   );

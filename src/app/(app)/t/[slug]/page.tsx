@@ -3,14 +3,11 @@
 import { notFound, useParams } from "next/navigation";
 import { Suspense, useEffect, useState, type ComponentType } from "react";
 
-import { ToolsShell } from "@/components/tools-shell";
 import { getToolBySlug } from "@/data/tools-registry";
-import { pushRecentToolSlug } from "@/lib/recent-tools";
 import { loadToolComponent } from "@/tools/load-tool";
 
 function ToolLoader({ slug }: { slug: string }) {
   const tool = getToolBySlug(slug);
-  // Store component inside an object so setState never treats it as an updater fn.
   const [loaded, setLoaded] = useState<{ Comp: ComponentType } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +16,6 @@ function ToolLoader({ slug }: { slug: string }) {
     let cancelled = false;
     setLoaded(null);
     setError(null);
-    pushRecentToolSlug(slug);
     loadToolComponent(slug)
       .then((Comp) => {
         if (!cancelled) setLoaded({ Comp });
@@ -61,12 +57,7 @@ function ToolLoader({ slug }: { slug: string }) {
 function ToolPageInner({ slug }: { slug: string }) {
   const tool = getToolBySlug(slug);
   if (!tool) notFound();
-
-  return (
-    <ToolsShell activeSlug={slug} title={tool.name}>
-      <ToolLoader slug={slug} />
-    </ToolsShell>
-  );
+  return <ToolLoader slug={slug} />;
 }
 
 export default function ToolPage() {
@@ -75,22 +66,18 @@ export default function ToolPage() {
 
   if (!slug) {
     return (
-      <ToolsShell title="Loading…">
-        <div className="flex min-h-[20rem] items-center justify-center">
-          <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
-        </div>
-      </ToolsShell>
+      <div className="flex min-h-[20rem] items-center justify-center">
+        <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
+      </div>
     );
   }
 
   return (
     <Suspense
       fallback={
-        <ToolsShell title="Loading…">
-          <div className="flex min-h-[20rem] items-center justify-center">
-            <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
-          </div>
-        </ToolsShell>
+        <div className="flex min-h-[20rem] items-center justify-center">
+          <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
+        </div>
       }
     >
       <ToolPageInner slug={slug} />

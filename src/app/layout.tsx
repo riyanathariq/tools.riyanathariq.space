@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Developer Tools · riyanathariq",
   description:
-    "Browser-based developer utilities — encoding, crypto, JSON, regex, and more. Everything runs locally in your browser.",
+    "Browser-based developer utilities — encoding, crypto, JSON, regex, and more.",
 };
 
 export default function RootLayout({

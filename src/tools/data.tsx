@@ -1,18 +1,25 @@
 "use client";
 
-import { diffLines } from "diff";
+import { diffWords, diffWordsWithSpace, type ChangeObject } from "diff";
 import { useEffect, useMemo, useState } from "react";
-import { format as formatSql } from "sql-formatter";
+import { format as formatSql, type SqlLanguage } from "sql-formatter";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  ClearButton,
   CopyButton,
+  DownloadButton,
   Panel,
+  SampleButton,
   TextIO,
   ToolHeader,
 } from "@/components/tool-workspace";
+import { getToolBySlug } from "@/data/tools-registry";
+
+const textareaClass =
+  "min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
 
 function sortObjectKeys(obj: unknown): unknown {
   if (Array.isArray(obj)) return obj.map(sortObjectKeys);
@@ -110,9 +117,57 @@ function basicCodeFormat(input: string): string {
 }
 
 const LOREM =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+  "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum";
+const LOREM_WORDS = LOREM.split(/\s+/);
+
+function randomInt(min: number, max: number) {
+  const lo = Math.min(min, max);
+  const hi = Math.max(min, max);
+  return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function generateParagraph(minWords: number, maxWords: number): string {
+  const count = randomInt(minWords, maxWords);
+  const words = Array.from(
+    { length: count },
+    () => LOREM_WORDS[Math.floor(Math.random() * LOREM_WORDS.length)]!,
+  );
+  words[0] = words[0]!.charAt(0).toUpperCase() + words[0]!.slice(1);
+  return `${words.join(" ")}.`;
+}
+
+function generateLorem(paragraphs: number, minWords: number, maxWords: number): string {
+  return Array.from({ length: paragraphs }, () => generateParagraph(minWords, maxWords)).join("\n\n");
+}
+
+const TEXT_DIFF_SAMPLE = {
+  left: "The quick brown fox jumps over the lazy dog.\nPack my box with five dozen liquor jugs.",
+  right: "The quick brown cat jumps over the lazy dogs.\nPack my box with five dozen liquor jars.",
+};
+
+function DiffSidePanel({ parts, side }: { parts: ChangeObject<string>[]; side: "left" | "right" }) {
+  return (
+    <pre className="max-h-[20rem] overflow-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-zinc-200">
+      {parts.map((part, i) => {
+        if (side === "left" && part.added) return null;
+        if (side === "right" && part.removed) return null;
+        const highlight = part.removed
+          ? "rounded bg-rose-500/25 text-rose-100"
+          : part.added
+            ? "rounded bg-emerald-500/25 text-emerald-100"
+            : "";
+        return (
+          <span key={i} className={highlight}>
+            {part.value}
+          </span>
+        );
+      })}
+    </pre>
+  );
+}
 
 export function jsonPrettier() {
+  const meta = getToolBySlug("json-prettier");
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"pretty" | "minify" | "sort">("pretty");
   const [output, setOutput] = useState("");
@@ -137,7 +192,11 @@ export function jsonPrettier() {
 
   return (
     <>
-      <ToolHeader name="JSON Prettier" description="Format, minify, validate, and sort JSON keys." />
+      <ToolHeader
+        name={meta?.name ?? "JSON Prettier"}
+        description={meta?.description ?? ""}
+        slug="json-prettier"
+      />
       <TextIO
         input={input}
         output={output}
@@ -146,12 +205,13 @@ export function jsonPrettier() {
         outputFilename="output.json"
         error={error}
         options={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {(["pretty", "minify", "sort"] as const).map((m) => (
               <Button key={m} type="button" variant={mode === m ? "primary" : "outline"} onClick={() => setMode(m)} className="capitalize">
                 {m === "sort" ? "Sort keys" : m}
               </Button>
             ))}
+            <SampleButton onClick={() => setInput('{"b":2,"a":1,"c":[3,1,2]}')} />
           </div>
         }
       />
@@ -160,6 +220,7 @@ export function jsonPrettier() {
 }
 
 export function jsonPath() {
+  const meta = getToolBySlug("json-path");
   const [json, setJson] = useState('{"user":{"name":"Ada","tags":["go","rust"]}}');
   const [path, setPath] = useState("$.user.tags[0]");
   const [output, setOutput] = useState("");
@@ -184,10 +245,20 @@ export function jsonPath() {
 
   return (
     <>
-      <ToolHeader name="JSON Path" description="Query JSON with simple path expressions." />
+      <ToolHeader
+        name={meta?.name ?? "JSON Path"}
+        description={meta?.description ?? ""}
+        slug="json-path"
+      />
       <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
         <label className="text-sm text-zinc-400">Path</label>
         <Input value={path} onChange={(e) => setPath(e.target.value)} placeholder="$.a.b[0]" className="max-w-md flex-1 font-mono" />
+        <SampleButton
+          onClick={() => {
+            setJson('{"user":{"name":"Ada","tags":["go","rust"]}}');
+            setPath("$.user.tags[0]");
+          }}
+        />
       </div>
       <TextIO input={json} output={output} onInputChange={setJson} onClear={() => setJson("")} inputLabel="JSON" outputFilename="result.json" error={error} />
     </>
@@ -195,6 +266,7 @@ export function jsonPath() {
 }
 
 export function jsonSchema() {
+  const meta = getToolBySlug("json-schema");
   const [json, setJson] = useState('{"name":"Ada","age":36}');
   const [schema, setSchema] = useState('{"type":"object","required":["name"],"properties":{"name":{"type":"string"},"age":{"type":"integer"}}}');
   const [output, setOutput] = useState("");
@@ -215,13 +287,17 @@ export function jsonSchema() {
 
   return (
     <>
-      <ToolHeader name="JSON Schema" description="Validate JSON against a schema (basic draft checks)." />
+      <ToolHeader
+        name={meta?.name ?? "JSON Schema"}
+        description={meta?.description ?? ""}
+        slug="json-schema"
+      />
       <div className="grid min-h-[28rem] gap-3 lg:grid-cols-2">
         <Panel title="JSON">
-          <Textarea value={json} onChange={(e) => setJson(e.target.value)} className="min-h-[12rem] border-0 bg-transparent p-0 font-mono text-sm focus:ring-0" />
+          <Textarea value={json} onChange={(e) => setJson(e.target.value)} className={`min-h-[12rem] ${textareaClass}`} />
         </Panel>
         <Panel title="Schema">
-          <Textarea value={schema} onChange={(e) => setSchema(e.target.value)} className="min-h-[12rem] border-0 bg-transparent p-0 font-mono text-sm focus:ring-0" />
+          <Textarea value={schema} onChange={(e) => setSchema(e.target.value)} className={`min-h-[12rem] ${textareaClass}`} />
         </Panel>
       </div>
       {error ? <p className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">{error}</p> : null}
@@ -233,15 +309,23 @@ export function jsonSchema() {
 }
 
 export function regex() {
+  const meta = getToolBySlug("regex");
   const [pattern, setPattern] = useState("\\b\\w+@\\w+\\.\\w+\\b");
   const [flags, setFlags] = useState("g");
   const [text, setText] = useState("Contact ada@example.com or bob@test.org");
+  const [mode, setMode] = useState<"match" | "replace">("match");
+  const [replacement, setReplacement] = useState("[redacted]");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       const re = new RegExp(pattern, flags);
+      if (mode === "replace") {
+        setOutput(text.replace(re, replacement));
+        setError(null);
+        return;
+      }
       const matches = [...text.matchAll(re)];
       if (!matches.length) {
         setOutput("No matches");
@@ -260,14 +344,34 @@ export function regex() {
       setError(e instanceof Error ? e.message : "Invalid regex");
       setOutput("");
     }
-  }, [pattern, flags, text]);
+  }, [pattern, flags, text, mode, replacement]);
 
   return (
     <>
-      <ToolHeader name="Regular Expression" description="Test regex patterns with live match groups." />
+      <ToolHeader
+        name={meta?.name ?? "Regular Expression"}
+        description={meta?.description ?? ""}
+        slug="regex"
+      />
       <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
         <Input value={pattern} onChange={(e) => setPattern(e.target.value)} placeholder="Pattern" className="max-w-md flex-1 font-mono" />
         <Input value={flags} onChange={(e) => setFlags(e.target.value)} placeholder="Flags" className="w-24 font-mono" />
+        <Button type="button" variant={mode === "match" ? "primary" : "outline"} onClick={() => setMode("match")}>
+          Match
+        </Button>
+        <Button type="button" variant={mode === "replace" ? "primary" : "outline"} onClick={() => setMode("replace")}>
+          Replace
+        </Button>
+        {mode === "replace" ? (
+          <Input value={replacement} onChange={(e) => setReplacement(e.target.value)} placeholder="Replacement" className="max-w-xs font-mono" />
+        ) : null}
+        <SampleButton
+          onClick={() => {
+            setPattern("\\b\\w+@\\w+\\.\\w+\\b");
+            setFlags("g");
+            setText("Contact ada@example.com or bob@test.org");
+          }}
+        />
       </div>
       <TextIO input={text} output={output} onInputChange={setText} onClear={() => setText("")} inputLabel="Text" outputFilename="matches.txt" error={error} />
     </>
@@ -275,41 +379,91 @@ export function regex() {
 }
 
 export function textDiff() {
-  const [left, setLeft] = useState("Line one\nLine two\nLine three");
-  const [right, setRight] = useState("Line one\nLine 2\nLine three\nLine four");
-  const output = useMemo(() => {
-    const changes = diffLines(left, right);
-    return changes
-      .map((part) => {
-        const prefix = part.added ? "+ " : part.removed ? "- " : "  ";
-        return part.value
-          .split("\n")
-          .filter((l, i, arr) => l || i < arr.length - 1)
-          .map((line) => prefix + line)
-          .join("\n");
-      })
-      .join("");
-  }, [left, right]);
+  const meta = getToolBySlug("text-diff");
+  const [left, setLeft] = useState(TEXT_DIFF_SAMPLE.left);
+  const [right, setRight] = useState(TEXT_DIFF_SAMPLE.right);
+  const [ignoreWhitespace, setIgnoreWhitespace] = useState(true);
+  const [ignoreCase, setIgnoreCase] = useState(false);
+
+  const diffParts = useMemo(() => {
+    const diffFn = ignoreWhitespace ? diffWords : diffWordsWithSpace;
+    return diffFn(left, right, { ignoreCase });
+  }, [left, right, ignoreWhitespace, ignoreCase]);
 
   return (
     <>
-      <ToolHeader name="Text Diff" description="Compare two texts and highlight differences." />
-      <div className="grid min-h-[28rem] gap-3 lg:grid-cols-2">
-        <Panel title="Text A">
-          <Textarea value={left} onChange={(e) => setLeft(e.target.value)} className="min-h-[20rem] border-0 bg-transparent p-0 font-mono text-sm focus:ring-0" />
-        </Panel>
-        <Panel title="Text B">
-          <Textarea value={right} onChange={(e) => setRight(e.target.value)} className="min-h-[20rem] border-0 bg-transparent p-0 font-mono text-sm focus:ring-0" />
-        </Panel>
+      <ToolHeader
+        name={meta?.name ?? "Text Diff"}
+        description={meta?.description ?? ""}
+        slug="text-diff"
+      />
+      <div className="flex min-h-[32rem] flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
+          <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={ignoreWhitespace}
+              onChange={(e) => setIgnoreWhitespace(e.target.checked)}
+              className="accent-emerald-500"
+            />
+            Ignore whitespace
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={ignoreCase}
+              onChange={(e) => setIgnoreCase(e.target.checked)}
+              className="accent-emerald-500"
+            />
+            Ignore case
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setLeft(right);
+              setRight(left);
+            }}
+          >
+            Swap
+          </Button>
+          <ClearButton
+            onClick={() => {
+              setLeft("");
+              setRight("");
+            }}
+          />
+          <SampleButton
+            label="Sample texts"
+            onClick={() => {
+              setLeft(TEXT_DIFF_SAMPLE.left);
+              setRight(TEXT_DIFF_SAMPLE.right);
+            }}
+          />
+        </div>
+        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-2">
+          <Panel title="Left">
+            <Textarea value={left} onChange={(e) => setLeft(e.target.value)} className={textareaClass} placeholder="Original text…" />
+          </Panel>
+          <Panel title="Right">
+            <Textarea value={right} onChange={(e) => setRight(e.target.value)} className={textareaClass} placeholder="Changed text…" />
+          </Panel>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <Panel title="Diff — left (removed)">
+            <DiffSidePanel parts={diffParts} side="left" />
+          </Panel>
+          <Panel title="Diff — right (added)">
+            <DiffSidePanel parts={diffParts} side="right" />
+          </Panel>
+        </div>
       </div>
-      <Panel title="Diff (+ added, - removed)" actions={<CopyButton value={output} />} className="mt-3">
-        <pre className="max-h-[20rem] overflow-auto whitespace-pre-wrap font-mono text-sm text-zinc-200">{output}</pre>
-      </Panel>
     </>
   );
 }
 
 export function textCase() {
+  const meta = getToolBySlug("text-case");
   const [input, setInput] = useState("hello_world-name");
   const [mode, setMode] = useState<"camel" | "pascal" | "snake" | "kebab" | "upper" | "lower" | "title">("camel");
   const output = useMemo(() => {
@@ -327,7 +481,11 @@ export function textCase() {
 
   return (
     <>
-      <ToolHeader name="Text Case" description="Convert between camel, snake, kebab, and more." />
+      <ToolHeader
+        name={meta?.name ?? "Text Case"}
+        description={meta?.description ?? ""}
+        slug="text-case"
+      />
       <TextIO
         input={input}
         output={output}
@@ -340,6 +498,7 @@ export function textCase() {
                 {m}
               </Button>
             ))}
+            <SampleButton onClick={() => setInput("hello_world-name")} />
           </div>
         }
       />
@@ -348,6 +507,7 @@ export function textCase() {
 }
 
 export function textStatistic() {
+  const meta = getToolBySlug("text-statistic");
   const [input, setInput] = useState("");
   const stats = useMemo(() => {
     const bytes = new TextEncoder().encode(input).length;
@@ -358,10 +518,14 @@ export function textStatistic() {
 
   return (
     <>
-      <ToolHeader name="Text Statistic" description="Count characters, words, lines, and bytes." />
+      <ToolHeader
+        name={meta?.name ?? "Text Statistic"}
+        description={meta?.description ?? ""}
+        slug="text-statistic"
+      />
       <div className="grid min-h-[24rem] gap-3 lg:grid-cols-2">
         <Panel title="Input">
-          <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Paste text…" className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0" />
+          <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Paste text…" className={textareaClass} />
         </Panel>
         <Panel title="Statistics">
           <dl className="grid grid-cols-2 gap-4 text-sm">
@@ -379,21 +543,33 @@ export function textStatistic() {
 }
 
 export function textFilter() {
+  const meta = getToolBySlug("text-filter");
   const [input, setInput] = useState("");
   const [pattern, setPattern] = useState("");
   const [mode, setMode] = useState<"include" | "exclude">("include");
+  const [ignoreCase, setIgnoreCase] = useState(false);
   const output = useMemo(() => {
     if (!input) return "";
     const lines = input.split("\n");
     if (!pattern) return input;
+    const match = (line: string) => {
+      if (ignoreCase) {
+        return line.toLowerCase().includes(pattern.toLowerCase());
+      }
+      return line.includes(pattern);
+    };
     return lines
-      .filter((line) => (mode === "include" ? line.includes(pattern) : !line.includes(pattern)))
+      .filter((line) => (mode === "include" ? match(line) : !match(line)))
       .join("\n");
-  }, [input, pattern, mode]);
+  }, [input, pattern, mode, ignoreCase]);
 
   return (
     <>
-      <ToolHeader name="Text Filter" description="Filter lines by include/exclude patterns." />
+      <ToolHeader
+        name={meta?.name ?? "Text Filter"}
+        description={meta?.description ?? ""}
+        slug="text-filter"
+      />
       <TextIO
         input={input}
         output={output}
@@ -404,6 +580,16 @@ export function textFilter() {
             <Input value={pattern} onChange={(e) => setPattern(e.target.value)} placeholder="Substring…" className="max-w-xs" />
             <Button type="button" variant={mode === "include" ? "primary" : "outline"} onClick={() => setMode("include")}>Include</Button>
             <Button type="button" variant={mode === "exclude" ? "primary" : "outline"} onClick={() => setMode("exclude")}>Exclude</Button>
+            <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <input type="checkbox" checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} className="accent-emerald-500" /> Case-insensitive
+            </label>
+            <SampleButton
+              onClick={() => {
+                setInput("Alpha\nbeta\nGamma\nDELTA\n");
+                setPattern("a");
+                setIgnoreCase(true);
+              }}
+            />
           </>
         }
       />
@@ -411,7 +597,10 @@ export function textFilter() {
   );
 }
 
+const SORT_SAMPLE = "banana\napple\nCherry\n42\n7\napple";
+
 export function textSorting() {
+  const meta = getToolBySlug("text-sorting");
   const [input, setInput] = useState("");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [numeric, setNumeric] = useState(false);
@@ -428,12 +617,18 @@ export function textSorting() {
 
   return (
     <>
-      <ToolHeader name="Text Sorting" description="Sort lines alphabetically or numerically." />
+      <ToolHeader
+        name={meta?.name ?? "Text Sorting"}
+        description={meta?.description ?? "Sort lines alphabetically or numerically (one line per entry)."}
+        slug="text-sorting"
+      />
       <TextIO
         input={input}
         output={output}
         onInputChange={setInput}
         onClear={() => setInput("")}
+        inputLabel="Lines"
+        outputLabel="Sorted lines"
         options={
           <>
             <Button type="button" variant={order === "asc" ? "primary" : "outline"} onClick={() => setOrder("asc")}>Asc</Button>
@@ -444,6 +639,7 @@ export function textSorting() {
             <label className="flex items-center gap-2 text-sm text-zinc-300">
               <input type="checkbox" checked={unique} onChange={(e) => setUnique(e.target.checked)} className="accent-emerald-500" /> Unique
             </label>
+            <SampleButton label="Sample lines" onClick={() => setInput(SORT_SAMPLE)} />
           </>
         }
       />
@@ -452,6 +648,7 @@ export function textSorting() {
 }
 
 export function textFormat() {
+  const meta = getToolBySlug("text-format");
   const [input, setInput] = useState("");
   const [ops, setOps] = useState({ trim: true, collapse: false, dedupe: false });
   const output = useMemo(() => {
@@ -464,7 +661,11 @@ export function textFormat() {
 
   return (
     <>
-      <ToolHeader name="Text Format" description="Trim, wrap, dedupe, and normalize whitespace." />
+      <ToolHeader
+        name={meta?.name ?? "Text Format"}
+        description={meta?.description ?? ""}
+        slug="text-format"
+      />
       <TextIO
         input={input}
         output={output}
@@ -477,6 +678,7 @@ export function textFormat() {
                 <input type="checkbox" checked={ops[k]} onChange={(e) => setOps({ ...ops, [k]: e.target.checked })} className="accent-emerald-500" /> {k === "collapse" ? "Collapse spaces" : k}
               </label>
             ))}
+            <SampleButton onClick={() => setInput("  hello   world  \n  hello   world  \nfoo")} />
           </>
         }
       />
@@ -484,8 +686,12 @@ export function textFormat() {
   );
 }
 
+const SQL_DIALECTS = ["sql", "mysql", "postgresql", "sqlite"] as const satisfies readonly SqlLanguage[];
+
 export function sqlFormat() {
+  const meta = getToolBySlug("sql-format");
   const [input, setInput] = useState("SELECT id,name FROM users WHERE active=1 ORDER BY created_at DESC");
+  const [dialect, setDialect] = useState<SqlLanguage>("sql");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -496,36 +702,114 @@ export function sqlFormat() {
       return;
     }
     try {
-      setOutput(formatSql(input, { language: "sql" }));
+      setOutput(formatSql(input, { language: dialect }));
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Format failed");
       setOutput("");
     }
-  }, [input]);
+  }, [input, dialect]);
 
   return (
     <>
-      <ToolHeader name="SQL Formatting" description="Pretty-print SQL queries." />
-      <TextIO input={input} output={output} onInputChange={setInput} onClear={() => setInput("")} outputFilename="query.sql" error={error} />
+      <ToolHeader
+        name={meta?.name ?? "SQL Formatting"}
+        description={meta?.description ?? ""}
+        slug="sql-format"
+      />
+      <TextIO
+        input={input}
+        output={output}
+        onInputChange={setInput}
+        onClear={() => setInput("")}
+        outputFilename="query.sql"
+        error={error}
+        options={
+          <div className="flex flex-wrap items-center gap-2">
+            {SQL_DIALECTS.map((d) => (
+              <Button key={d} type="button" variant={dialect === d ? "primary" : "outline"} onClick={() => setDialect(d)} className="capitalize">
+                {d === "sql" ? "Standard" : d}
+              </Button>
+            ))}
+            <SampleButton
+              onClick={() => setInput("SELECT id,name FROM users WHERE active=1 ORDER BY created_at DESC")}
+            />
+          </div>
+        }
+      />
     </>
   );
 }
 
 export function loremIpsum() {
+  const meta = getToolBySlug("lorem-ipsum");
   const [paragraphs, setParagraphs] = useState(3);
-  const output = useMemo(() => Array.from({ length: paragraphs }, () => LOREM).join("\n\n"), [paragraphs]);
+  const [minWords, setMinWords] = useState(20);
+  const [maxWords, setMaxWords] = useState(60);
+  const [seed, setSeed] = useState(0);
+
+  const output = useMemo(
+    () => generateLorem(paragraphs, minWords, maxWords),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seed triggers regeneration
+    [paragraphs, minWords, maxWords, seed],
+  );
 
   return (
     <>
-      <ToolHeader name="Lorem Ipsum" description="Generate placeholder paragraphs." />
+      <ToolHeader
+        name={meta?.name ?? "Lorem Ipsum"}
+        description={meta?.description ?? ""}
+        slug="lorem-ipsum"
+      />
       <div className="flex min-h-[20rem] flex-col gap-3">
-        <div className="flex items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
-          <label className="text-sm text-zinc-400">Paragraphs</label>
-          <Input type="number" min={1} max={20} value={paragraphs} onChange={(e) => setParagraphs(Number(e.target.value) || 1)} className="w-20" />
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
+          <label className="flex items-center gap-2 text-sm text-zinc-400">
+            Paragraphs
+            <Input
+              type="number"
+              min={1}
+              max={20}
+              value={paragraphs}
+              onChange={(e) => setParagraphs(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+              className="w-20"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-400">
+            Min words
+            <Input
+              type="number"
+              min={1}
+              max={200}
+              value={minWords}
+              onChange={(e) => setMinWords(Math.max(1, Number(e.target.value) || 1))}
+              className="w-20"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-400">
+            Max words
+            <Input
+              type="number"
+              min={1}
+              max={200}
+              value={maxWords}
+              onChange={(e) => setMaxWords(Math.max(1, Number(e.target.value) || 1))}
+              className="w-20"
+            />
+          </label>
+          <Button type="button" variant="outline" onClick={() => setSeed((s) => s + 1)}>
+            Regenerate
+          </Button>
         </div>
-        <Panel title="Output" actions={<CopyButton value={output} />}>
-          <Textarea value={output} readOnly className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0" />
+        <Panel
+          title="Output"
+          actions={
+            <>
+              <CopyButton value={output} />
+              <DownloadButton value={output} filename="lorem-ipsum.txt" />
+            </>
+          }
+        >
+          <Textarea value={output} readOnly className={textareaClass} />
         </Panel>
       </div>
     </>
@@ -533,6 +817,7 @@ export function loremIpsum() {
 }
 
 export function codeFormat() {
+  const meta = getToolBySlug("code-format");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -554,8 +839,22 @@ export function codeFormat() {
 
   return (
     <>
-      <ToolHeader name="Code Style Formatting" description="Format JSON, JS-ish objects, and CSS-ish blocks lightly." />
-      <TextIO input={input} output={output} onInputChange={setInput} onClear={() => setInput("")} outputFilename="formatted.txt" error={error} />
+      <ToolHeader
+        name={meta?.name ?? "Code Style Formatting"}
+        description={meta?.description ?? ""}
+        slug="code-format"
+      />
+      <TextIO
+        input={input}
+        output={output}
+        onInputChange={setInput}
+        onClear={() => setInput("")}
+        outputFilename="formatted.txt"
+        error={error}
+        options={
+          <SampleButton onClick={() => setInput('{"a":1,"b":[2,3]}')} />
+        }
+      />
     </>
   );
 }
