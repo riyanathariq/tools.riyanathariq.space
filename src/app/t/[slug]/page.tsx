@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState, type ComponentType } from "react";
 
 import { ToolsShell } from "@/components/tools-shell";
 import { getToolBySlug } from "@/data/tools-registry";
+import { pushRecentToolSlug } from "@/lib/recent-tools";
 import { loadToolComponent } from "@/tools/load-tool";
 
 function ToolLoader({ slug }: { slug: string }) {
@@ -14,6 +15,7 @@ function ToolLoader({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!tool) return;
+    pushRecentToolSlug(slug);
     loadToolComponent(slug)
       .then(setComponent)
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load tool"));

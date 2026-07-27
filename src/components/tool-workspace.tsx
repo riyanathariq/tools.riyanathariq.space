@@ -3,6 +3,7 @@
 import { Check, Copy, Download, Trash2 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
+import { useToast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { copyText, downloadText, cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ export function Panel({
 
 export function CopyButton({ value }: { value: string }) {
   const [ok, setOk] = useState(false);
+  const { toast } = useToast();
   return (
     <Button
       type="button"
@@ -46,6 +48,7 @@ export function CopyButton({ value }: { value: string }) {
       onClick={async () => {
         await copyText(value);
         setOk(true);
+        toast("Copied to clipboard");
         setTimeout(() => setOk(false), 1200);
       }}
       aria-label="Copy"
