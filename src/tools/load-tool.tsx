@@ -83,8 +83,9 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     // Media
     case "image-converter":
     case "qr-code":
-    case "color-picker":
       return pickComponent(await import("@/tools/media"), slug);
+    case "color-picker":
+      return pickComponent(await import("@/tools/color-picker"), slug);
     case "svg-converter":
     case "favicon-generator":
       return pickComponent(await import("@/tools/extra-media"), slug);

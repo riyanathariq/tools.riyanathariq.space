@@ -407,10 +407,10 @@ export const toolsRegistry: ToolMeta[] = [
   {
     slug: "color-picker",
     name: "Color Picker",
-    description: "Convert between HEX, RGB, and HSL.",
+    description: "HSV picker with alpha, CSS formats, eyedropper, and image sampling.",
     category: "media",
-    keywords: ["color", "hex", "rgb"],
-    info: "Live conversion between HEX, RGB, and HSL with copy chips. Alpha/hex8 is limited — prefer solid colors.",
+    keywords: ["color", "hex", "rgb", "hsl", "eyedropper", "alpha"],
+    info: "Pick via SV plane, hue/alpha sliders, or RGB/HEX inputs. Copy rgb/rgba/hex/hex8/hsl/hsla. Chromium eyedropper samples the screen. Upload an image and hover to sample pixels (click to lock).",
   },
   {
     slug: "svg-converter",
