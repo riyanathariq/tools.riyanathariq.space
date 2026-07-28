@@ -124,6 +124,14 @@ export const toolsRegistry: ToolMeta[] = [
     keywords: ["password", "random"],
     info: "Uses crypto.getRandomValues. Toggle character classes and optionally exclude ambiguous glyphs (0/O, 1/l/I). Strength meter is heuristic only.",
   },
+  {
+    slug: "password-hash",
+    name: "Password Hash",
+    description: "Hash and verify passwords with bcrypt in your browser.",
+    category: "crypto",
+    keywords: ["bcrypt", "hash", "password"],
+    info: "Client-side bcrypt via bcryptjs (cost 4–12). Useful for demos and local checks — prefer proper KDF settings and secrets management in production.",
+  },
 
   // IDs & time
   {
@@ -153,10 +161,10 @@ export const toolsRegistry: ToolMeta[] = [
   {
     slug: "cron",
     name: "Cron Expression",
-    description: "Explain cron expressions and show next run times.",
+    description: "Explain cron expressions (5-field or Quartz 6-field) and show next runs.",
     category: "ids",
-    keywords: ["cron", "schedule"],
-    info: "Explains standard 5-field cron (minute hour day month weekday) and lists upcoming runs in your local timezone. Quartz seconds fields are not fully supported.",
+    keywords: ["cron", "schedule", "quartz"],
+    info: "Supports standard 5-field cron (minute hour day month weekday) and a Light 6-field Quartz-style mode with seconds. Next runs use your local timezone. Complex Quartz features (L, W, #) may not parse.",
   },
   {
     slug: "datetime",
@@ -165,6 +173,22 @@ export const toolsRegistry: ToolMeta[] = [
     category: "ids",
     keywords: ["unix", "timestamp", "iso"],
     info: "Bidirectional converter between Unix seconds/ms and calendar fields in a chosen IANA timezone. Format presets are for display/copy. Month/year averages are approximate when used as units elsewhere.",
+  },
+  {
+    slug: "uuid-ulid",
+    name: "UUID ↔ ULID",
+    description: "Convert between UUID and ULID formats.",
+    category: "ids",
+    keywords: ["uuid", "ulid", "convert"],
+    info: "Converts valid UUIDs to ULIDs and back using the shared 128-bit layout. Invalid input shows a clear error — does not invent timestamps.",
+  },
+  {
+    slug: "timezone-planner",
+    name: "Timezone Planner",
+    description: "Compare a moment across multiple IANA timezones.",
+    category: "ids",
+    keywords: ["timezone", "meeting", "planner", "utc"],
+    info: "Pick a base date/time and 2–4 timezones to see equivalent local times. Uses Intl — no network calls.",
   },
 
   // Data & text
@@ -272,6 +296,46 @@ export const toolsRegistry: ToolMeta[] = [
     keywords: ["prettier", "format", "code"],
     info: "Lightweight formatting helpers — not a full Prettier/ESLint pipeline. Best for JSON and small snippets.",
   },
+  {
+    slug: "markdown-preview",
+    name: "Markdown Preview",
+    description: "Edit Markdown and preview rendered HTML locally.",
+    category: "data",
+    keywords: ["markdown", "md", "preview"],
+    info: "Renders Markdown in your browser with basic script stripping. Not a full CommonMark/GFM security sanitizer for untrusted content.",
+  },
+  {
+    slug: "yaml-json",
+    name: "YAML ↔ JSON",
+    description: "Convert between YAML and JSON.",
+    category: "data",
+    keywords: ["yaml", "yml", "json"],
+    info: "Bidirectional convert via js-yaml. Complex YAML tags/anchors may not round-trip perfectly.",
+  },
+  {
+    slug: "env-toml",
+    name: "ENV & TOML",
+    description: "Parse .env files and TOML into JSON.",
+    category: "data",
+    keywords: ["env", "dotenv", "toml"],
+    info: "Parses KEY=VALUE env lines and TOML documents into JSON for inspection. Does not execute shell expansions.",
+  },
+  {
+    slug: "graphql-format",
+    name: "GraphQL Format",
+    description: "Pretty-print or minify GraphQL documents.",
+    category: "data",
+    keywords: ["graphql", "gql", "format"],
+    info: "Uses the graphql package to parse and print queries/mutations. Invalid GraphQL shows a parse error.",
+  },
+  {
+    slug: "openapi-viewer",
+    name: "OpenAPI Viewer",
+    description: "Paste OpenAPI 3 JSON/YAML and list paths and methods.",
+    category: "data",
+    keywords: ["openapi", "swagger", "api"],
+    info: "Lightweight path/method/summary browser — not full Swagger UI. Accepts OpenAPI 3 JSON or YAML pasted locally.",
+  },
 
   // HTTP & CLI
   {
@@ -289,6 +353,38 @@ export const toolsRegistry: ToolMeta[] = [
     category: "http",
     keywords: ["cli", "shell", "bash"],
     info: "Helpers for shell quoting and escaping. Quote style (single/double) changes which characters need escaping.",
+  },
+  {
+    slug: "url-parser",
+    name: "URL Parser",
+    description: "Break down and rebuild URLs and query strings.",
+    category: "http",
+    keywords: ["url", "query", "parser"],
+    info: "Parses protocol, host, path, hash, and query params. Editing params rebuilds the URL in-browser.",
+  },
+  {
+    slug: "cidr-calculator",
+    name: "CIDR Calculator",
+    description: "Calculate network, broadcast, and host ranges from CIDR.",
+    category: "http",
+    keywords: ["cidr", "subnet", "ip", "network"],
+    info: "IPv4 (and IPv6 when provided) subnet math via ipaddr.js. No WHOIS or remote lookup.",
+  },
+  {
+    slug: "chmod-calculator",
+    name: "Chmod Calculator",
+    description: "Convert between octal and symbolic Unix permissions.",
+    category: "http",
+    keywords: ["chmod", "permissions", "unix", "755"],
+    info: "Interactive ugo rwx ↔ octal (e.g. 755) ↔ symbolic mode. Does not apply permissions to files.",
+  },
+  {
+    slug: "cert-inspector",
+    name: "Certificate Inspector",
+    description: "Inspect a pasted X.509 PEM certificate locally.",
+    category: "http",
+    keywords: ["tls", "ssl", "certificate", "pem", "x509"],
+    info: "Paste a PEM certificate to view subject, issuer, dates, SANs, and fingerprint. Does not fetch remote host certificates (no network).",
   },
 
   // Media
@@ -315,6 +411,22 @@ export const toolsRegistry: ToolMeta[] = [
     category: "media",
     keywords: ["color", "hex", "rgb"],
     info: "Live conversion between HEX, RGB, and HSL with copy chips. Alpha/hex8 is limited — prefer solid colors.",
+  },
+  {
+    slug: "svg-converter",
+    name: "SVG Converter",
+    description: "Preview SVG and export PNG in your browser.",
+    category: "media",
+    keywords: ["svg", "png", "vector"],
+    info: "Paste or upload SVG, preview, download SVG, or rasterize to PNG via canvas. Complex filters/fonts may differ from desktop renderers.",
+  },
+  {
+    slug: "favicon-generator",
+    name: "Favicon Generator",
+    description: "Generate multi-size favicon PNGs from an image.",
+    category: "media",
+    keywords: ["favicon", "icon", "png"],
+    info: "Upload a square-ish image and export common favicon sizes (16–180). Pure PNG downloads — no .ico packer.",
   },
 
   // Misc

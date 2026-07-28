@@ -423,10 +423,17 @@ export function nanoid() {
   );
 }
 
-const CRON_SAMPLES = ["0 9 * * 1-5", "*/5 * * * *", "0 0 1 * *", "0 12 * * 0"];
+const CRON_SAMPLES_5 = ["0 9 * * 1-5", "*/5 * * * *", "0 0 1 * *", "0 12 * * 0"];
+const CRON_SAMPLES_6 = [
+  "0 0 9 * * 1-5",
+  "0 */30 * * * *",
+  "0 0 0 1 * *",
+  "0 0 12 * * 0",
+];
 
 export function cron() {
   const meta = getToolBySlug("cron");
+  const [sixField, setSixField] = useState(false);
   const [expr, setExpr] = useState("0 9 * * 1-5");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -437,38 +444,77 @@ export function cron() {
       setError(null);
       return;
     }
+    const trimmed = expr.trim();
+    const fields = trimmed.split(/\s+/);
     try {
-      const human = cronstrue.toString(expr.trim(), { throwExceptionOnParseError: true });
-      const interval = CronExpressionParser.parse(expr.trim());
+      if (sixField && fields.length !== 6) {
+        throw new Error("6-field mode expects: second minute hour day month weekday");
+      }
+      if (!sixField && fields.length === 6) {
+        throw new Error("5-field mode: remove the seconds field or enable 6-field (Quartz) mode");
+      }
+      const human = cronstrue.toString(trimmed, { throwExceptionOnParseError: true });
+      const interval = CronExpressionParser.parse(trimmed);
       const next: string[] = [];
       for (let i = 0; i < 5; i++) {
         next.push(interval.next().toDate().toString());
       }
-      setOutput(`${human}\n\nNext 5 runs (local):\n${next.map((d, i) => `${i + 1}. ${d}`).join("\n")}`);
+      const modeNote = sixField
+        ? "Mode: 6-field (Quartz / seconds)\n\n"
+        : "Mode: 5-field (standard cron)\n\n";
+      setOutput(
+        `${modeNote}${human}\n\nNext 5 runs (local):\n${next.map((d, i) => `${i + 1}. ${d}`).join("\n")}`,
+      );
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Invalid cron expression");
       setOutput("");
     }
-  }, [expr]);
+  }, [expr, sixField]);
+
+  const samples = sixField ? CRON_SAMPLES_6 : CRON_SAMPLES_5;
 
   return (
     <>
       <ToolHeader name={meta?.name ?? "Cron Expression"} description={meta?.description ?? ""} slug="cron" />
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <Button
+          type="button"
+          variant={!sixField ? "primary" : "outline"}
+          onClick={() => {
+            setSixField(false);
+            if (expr.trim().split(/\s+/).length === 6) setExpr("0 9 * * 1-5");
+          }}
+        >
+          5-field (standard)
+        </Button>
+        <Button
+          type="button"
+          variant={sixField ? "primary" : "outline"}
+          onClick={() => {
+            setSixField(true);
+            if (expr.trim().split(/\s+/).length === 5) setExpr("0 0 9 * * 1-5");
+          }}
+        >
+          6-field (Quartz / seconds)
+        </Button>
+        <span className="text-xs text-zinc-500">
+          Human-readable text via cronstrue; next runs via cron-parser. Strict 6-field rules (e.g. no
+          mixed day-of-month + weekday) apply only when using parser strict mode — not enabled here.
+        </span>
+      </div>
       <TextIO
         input={expr}
         output={output}
         onInputChange={setExpr}
         onClear={() => setExpr("")}
-        inputLabel="Cron expression"
+        inputLabel={sixField ? "Cron expression (second minute hour day month weekday)" : "Cron expression"}
         outputFilename="cron.txt"
         error={error}
         options={
           <div className="flex flex-wrap gap-2">
-            {CRON_SAMPLES.map((s) => (
-              <Button key={s} type="button" variant="outline" onClick={() => setExpr(s)}>
-                {s}
-              </Button>
+            {samples.map((s) => (
+              <SampleButton key={s} label={s} onClick={() => setExpr(s)} />
             ))}
           </div>
         }
