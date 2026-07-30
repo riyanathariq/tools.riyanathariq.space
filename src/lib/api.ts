@@ -38,6 +38,8 @@ export type SmtpTestPayload = {
   to: string;
   subject: string;
   text: string;
+  /** When true, message is sent as text/html. */
+  html?: boolean;
 };
 
 export type SmtpStep = {

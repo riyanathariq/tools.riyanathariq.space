@@ -1,7 +1,12 @@
 "use client";
 
+import { AuthProvider } from "@/components/auth-provider";
 import { ToolsShell } from "@/components/tools-shell";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <ToolsShell>{children}</ToolsShell>;
+  return (
+    <AuthProvider>
+      <ToolsShell>{children}</ToolsShell>
+    </AuthProvider>
+  );
 }

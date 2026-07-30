@@ -25,7 +25,7 @@ export interface ToolMeta {
 export type ToolComponent = ComponentType;
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  cloud: "Cloud (login)",
+  cloud: "Premium Tool",
   encoding: "Encoding",
   crypto: "Crypto & Keys",
   ids: "IDs & Time",

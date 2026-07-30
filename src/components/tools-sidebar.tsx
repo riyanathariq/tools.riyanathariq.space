@@ -118,7 +118,7 @@ export function ToolsSidebar({
                       )}
                     >
                       <span className="min-w-0 flex-1 truncate">{tool.name}</span>
-                      {tool.cloud ? <Cloud className="size-3.5 shrink-0 opacity-70" aria-label="Cloud tool" /> : null}
+                      {tool.cloud ? <Cloud className="size-3.5 shrink-0 opacity-70" aria-label="Premium tool" /> : null}
                     </Link>
                   </li>
                 );

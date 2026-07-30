@@ -74,7 +74,7 @@ export function ToolsShell({ children }: { children: ReactNode }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-zinc-100 lg:hidden">{title}</p>
             <p className="hidden text-sm text-zinc-500 lg:block">
-              Local tools run in-browser · Cloud tools need sign-in
+              Local tools run in-browser · Premium tools need sign-in
             </p>
           </div>
           <AuthButton />

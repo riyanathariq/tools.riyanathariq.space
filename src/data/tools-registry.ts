@@ -1,13 +1,13 @@
 import type { ToolMeta } from "@/types/tool";
 
 export const toolsRegistry: ToolMeta[] = [
-  // Cloud (login + Go API)
+  // Cloud / Premium tools (login + Go API)
   {
     slug: "smtp-tester",
     name: "SMTP Tester",
     description: "Send a test email using your own SMTP host, port, and credentials.",
     category: "cloud",
-    keywords: ["smtp", "email", "mail", "starttls"],
+    keywords: ["smtp", "email", "mail", "starttls", "premium"],
     cloud: true,
     info: "Bring your own SMTP (Gmail app password, SES, SendGrid, etc.). The Go API connects and sends once — credentials are not stored. Sign-in required. Rate limited.",
   },
