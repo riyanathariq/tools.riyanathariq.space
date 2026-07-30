@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 
 export type ToolCategory =
+  | "cloud"
   | "encoding"
   | "crypto"
   | "ids"
@@ -17,11 +18,14 @@ export interface ToolMeta {
   keywords: string[];
   /** Short help shown in the tool header (i) popover. */
   info: string;
+  /** Requires Go API + Google login. */
+  cloud?: boolean;
 }
 
 export type ToolComponent = ComponentType;
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
+  cloud: "Cloud (login)",
   encoding: "Encoding",
   crypto: "Crypto & Keys",
   ids: "IDs & Time",

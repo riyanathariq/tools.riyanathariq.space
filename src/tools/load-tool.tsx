@@ -13,6 +13,10 @@ function pickComponent(mod: ToolModule, slug: string): ComponentType {
 
 export async function loadToolComponent(slug: string): Promise<ComponentType> {
   switch (slug) {
+    // Cloud
+    case "smtp-tester":
+      return pickComponent(await import("@/tools/cloud"), slug);
+
     // Encoding
     case "base64":
     case "base32":

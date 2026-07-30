@@ -6,6 +6,7 @@ import { toolsRegistry } from "@/data/tools-registry";
 import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
 
 const categoryOrder: ToolCategory[] = [
+  "cloud",
   "encoding",
   "crypto",
   "ids",
@@ -28,7 +29,8 @@ export default function HomePage() {
           Developer Tools
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
-          Encoding, crypto, data manipulation, and more — everything runs in your browser.
+          Encoding, crypto, data, and more — local tools run in your browser. Cloud tools (SMTP,
+          soon webhooks) require Google sign-in.
         </p>
       </div>
 

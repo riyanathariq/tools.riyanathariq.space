@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
+import { Cloud, Search, X } from "lucide-react";
 
 import { searchTools } from "@/data/tools-registry";
 import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 const categoryOrder: ToolCategory[] = [
+  "cloud",
   "encoding",
   "crypto",
   "ids",
@@ -110,13 +111,14 @@ export function ToolsSidebar({
                       href={`/t/${tool.slug}`}
                       onClick={onClose}
                       className={cn(
-                        "block rounded-xl px-3 py-2.5 text-sm transition-colors",
+                        "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm transition-colors",
                         active
                           ? "bg-emerald-500/15 text-emerald-300"
                           : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100",
                       )}
                     >
-                      {tool.name}
+                      <span className="min-w-0 flex-1 truncate">{tool.name}</span>
+                      {tool.cloud ? <Cloud className="size-3.5 shrink-0 opacity-70" aria-label="Cloud tool" /> : null}
                     </Link>
                   </li>
                 );
