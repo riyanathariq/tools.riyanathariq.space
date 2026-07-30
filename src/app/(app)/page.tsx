@@ -29,8 +29,8 @@ export default function HomePage() {
           Developer Tools
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
-          Encoding, crypto, data, and more — local tools run in your browser. Premium tools (SMTP,
-          soon webhooks) need sign-in.
+          Encoding, crypto, data, and more — local tools run in your browser. Premium tools (SMTP
+          Tester, Webhook Bin) need sign-in.
         </p>
       </div>
 

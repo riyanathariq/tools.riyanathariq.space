@@ -16,6 +16,8 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     // Cloud
     case "smtp-tester":
       return pickComponent(await import("@/tools/cloud"), slug);
+    case "webhook-bin":
+      return pickComponent(await import("@/tools/webhook-bin"), slug);
 
     // Encoding
     case "base64":

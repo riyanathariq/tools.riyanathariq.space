@@ -11,6 +11,15 @@ export const toolsRegistry: ToolMeta[] = [
     cloud: true,
     info: "Bring your own SMTP (Gmail app password, SES, SendGrid, etc.). The Go API connects and sends once — credentials are not stored. Sign-in required. Rate limited.",
   },
+  {
+    slug: "webhook-bin",
+    name: "Webhook Bin",
+    description: "Unique URL that captures inbound HTTP requests for debugging webhooks.",
+    category: "cloud",
+    keywords: ["webhook", "hook", "http", "request bin", "stripe", "github", "premium"],
+    cloud: true,
+    info: "Create a public /hook/{id} endpoint, point any provider at it, and inspect method, headers, query, and body live. Up to 3 bins, 100 hits each, 72h TTL. Auth/Cookie headers are redacted. Sign-in required.",
+  },
 
   // Encoding
   {

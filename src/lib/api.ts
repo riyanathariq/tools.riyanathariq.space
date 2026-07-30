@@ -71,3 +71,126 @@ export async function testSmtp(payload: SmtpTestPayload): Promise<SmtpTestResult
   }
   return data;
 }
+
+export type WebhookBin = {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
+  expiresAt: string;
+  hitCount: number;
+  lastHitAt?: string;
+};
+
+export type WebhookHitSummary = {
+  id: string;
+  receivedAt: string;
+  method: string;
+  path: string;
+  query?: string;
+  contentType?: string;
+  bodyBytes: number;
+  ip: string;
+};
+
+export type WebhookHit = WebhookHitSummary & {
+  binId: string;
+  queryParams?: Record<string, string>;
+  headers: Record<string, string>;
+  body: string;
+  bodyTruncated: boolean;
+  userAgent?: string;
+};
+
+export type WebhookLimits = {
+  maxBinsPerUser: number;
+  maxHitsPerBin: number;
+  maxBodyBytes: number;
+  ttlHours: number;
+};
+
+export type WebhookBinItem = {
+  bin: WebhookBin;
+  hookUrl: string;
+};
+
+async function apiError(res: Response, data: { error?: string }): Promise<never> {
+  if (res.status === 401) throw new Error("Sign in required");
+  if (res.status === 429) throw new Error(data.error || "Rate limit exceeded");
+  throw new Error(data.error || `Request failed (${res.status})`);
+}
+
+export async function listWebhookBins(): Promise<{
+  bins: WebhookBinItem[];
+  limits: WebhookLimits;
+}> {
+  const res = await fetch("/api/cloud/webhook/bins", {
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await parseJSON<{ bins: WebhookBinItem[]; limits: WebhookLimits; error?: string }>(res);
+  if (!res.ok) await apiError(res, data);
+  return { bins: data.bins ?? [], limits: data.limits };
+}
+
+export async function createWebhookBin(name?: string): Promise<WebhookBinItem & { limits: WebhookLimits }> {
+  const res = await fetch("/api/cloud/webhook/bins", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: name ?? "" }),
+  });
+  const data = await parseJSON<WebhookBinItem & { limits: WebhookLimits; error?: string }>(res);
+  if (!res.ok) await apiError(res, data);
+  return data;
+}
+
+export async function getWebhookBin(id: string): Promise<{
+  bin: WebhookBin;
+  hookUrl: string;
+  hits: WebhookHitSummary[];
+  limits: WebhookLimits;
+}> {
+  const res = await fetch(`/api/cloud/webhook/bins/${id}`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await parseJSON<{
+    bin: WebhookBin;
+    hookUrl: string;
+    hits: WebhookHitSummary[];
+    limits: WebhookLimits;
+    error?: string;
+  }>(res);
+  if (!res.ok) await apiError(res, data);
+  return data;
+}
+
+export async function deleteWebhookBin(id: string): Promise<void> {
+  const res = await fetch(`/api/cloud/webhook/bins/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const data = await parseJSON<{ error?: string }>(res);
+  if (!res.ok) await apiError(res, data);
+}
+
+export async function clearWebhookHits(id: string): Promise<WebhookBin> {
+  const res = await fetch(`/api/cloud/webhook/bins/${id}/hits`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const data = await parseJSON<{ bin: WebhookBin; error?: string }>(res);
+  if (!res.ok) await apiError(res, data);
+  return data.bin;
+}
+
+export async function getWebhookHit(binId: string, hitId: string): Promise<WebhookHit> {
+  const res = await fetch(`/api/cloud/webhook/bins/${binId}/hits/${hitId}`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await parseJSON<{ hit: WebhookHit; error?: string }>(res);
+  if (!res.ok) await apiError(res, data);
+  return data.hit;
+}
