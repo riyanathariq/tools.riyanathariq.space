@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 
 import { AuthButton } from "@/components/auth-button";
 import { ToolsSidebar } from "@/components/tools-sidebar";
+import { VisitorBeacon } from "@/components/visitor-beacon";
 import { getToolBySlug } from "@/data/tools-registry";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ export function ToolsShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative flex min-h-dvh bg-zinc-950 text-zinc-100">
+      <VisitorBeacon />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.35]"
         style={{

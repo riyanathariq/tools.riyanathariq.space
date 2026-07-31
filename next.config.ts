@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/auth/:path*", destination: `${apiProxy}/auth/:path*` },
       { source: "/api/cloud/:path*", destination: `${apiProxy}/api/cloud/:path*` },
+      { source: "/api/events/:path*", destination: `${apiProxy}/api/events/:path*` },
       { source: "/hook/:path*", destination: `${apiProxy}/hook/:path*` },
       { source: "/healthz", destination: `${apiProxy}/healthz` },
     ];
