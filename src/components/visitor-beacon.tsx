@@ -18,7 +18,8 @@ function randomID(): string {
 
 function setCookie(name: string, value: string, maxAge: number) {
   const secure = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
+  const age = maxAge > 0 ? `; Max-Age=${maxAge}` : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/${age}; SameSite=Lax${secure}`;
 }
 
 function ensureVisitorID(): string {
