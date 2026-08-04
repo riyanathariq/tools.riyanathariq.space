@@ -72,6 +72,40 @@ export async function testSmtp(payload: SmtpTestPayload): Promise<SmtpTestResult
   return data;
 }
 
+export type SmtpAuthCheckPayload = {
+  host: string;
+  port: number;
+  security: "starttls" | "ssl" | "none";
+  username: string;
+  password: string;
+};
+
+export type SmtpAuthCheckResult = {
+  ok: boolean;
+  message?: string;
+  error?: string;
+  host?: string;
+  port?: number;
+  security?: string;
+};
+
+export async function checkSmtpAuth(payload: SmtpAuthCheckPayload): Promise<SmtpAuthCheckResult> {
+  const res = await fetch("/api/cloud/smtp/check-auth", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await parseJSON<SmtpAuthCheckResult>(res);
+  if (res.status === 401) {
+    return { ok: false, error: "Sign in required" };
+  }
+  if (res.status === 429) {
+    return { ok: false, error: data.error || "Rate limit exceeded" };
+  }
+  return data;
+}
+
 export type WebhookBin = {
   id: string;
   userId: string;

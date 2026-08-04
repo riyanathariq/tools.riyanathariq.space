@@ -1,6 +1,6 @@
 "use client";
 
-import { Code2, Eye } from "lucide-react";
+import { CheckCircle2, Code2, Eye, KeyRound, Loader2, Send, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { CloudGate } from "@/components/cloud-gate";
 import { Panel, ToolHeader } from "@/components/tool-workspace";
 import { getToolBySlug } from "@/data/tools-registry";
-import { testSmtp, type SmtpTestResult } from "@/lib/api";
+import {
+  checkSmtpAuth,
+  testSmtp,
+  type SmtpAuthCheckResult,
+  type SmtpTestResult,
+} from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const PRESETS: Record<string, { host: string; port: string; security: "starttls" | "ssl" | "none" }> =
@@ -47,6 +52,12 @@ function buildPreviewSrcDoc(body: string): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:28px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;color:#18181b;background:#fff;font-size:13px;line-height:1.65;">${escapeHtml(trimmed)}</body></html>`;
 }
 
+function parsePort(port: string): number | null {
+  const portNum = Number.parseInt(port.trim(), 10);
+  if (!Number.isFinite(portNum) || portNum < 1 || portNum > 65535) return null;
+  return portNum;
+}
+
 export function smtpTester() {
   const meta = getToolBySlug("smtp-tester");
   const [preset, setPreset] = useState("custom");
@@ -62,10 +73,13 @@ export function smtpTester() {
     "<p>Hello — this is an <strong>SMTP test</strong> from tools.riyanathariq.space.</p>",
   );
   const [mobilePane, setMobilePane] = useState<MobilePane>("editor");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SmtpTestResult | null>(null);
+  const [sending, setSending] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [authResult, setAuthResult] = useState<SmtpAuthCheckResult | null>(null);
+  const [sendResult, setSendResult] = useState<SmtpTestResult | null>(null);
 
   const previewSrcDoc = useMemo(() => buildPreviewSrcDoc(text), [text]);
+  const busy = sending || checking;
 
   const applyPreset = (key: string) => {
     setPreset(key);
@@ -73,22 +87,56 @@ export function smtpTester() {
     setHost(p.host);
     setPort(p.port);
     setSecurity(p.security);
+    setAuthResult(null);
   };
 
   const onSecurityChange = (s: "starttls" | "ssl" | "none") => {
     setSecurity(s);
     setPreset("custom");
+    setAuthResult(null);
   };
 
-  const onSubmit = async () => {
-    const portNum = Number.parseInt(port.trim(), 10);
-    if (!Number.isFinite(portNum) || portNum < 1 || portNum > 65535) {
-      setResult({ ok: false, steps: [], error: "Port must be a number between 1 and 65535" });
+  const onCheckAuth = async () => {
+    const portNum = parsePort(port);
+    if (portNum === null) {
+      setAuthResult({ ok: false, error: "Port must be a number between 1 and 65535" });
+      return;
+    }
+    if (!host.trim() || !username.trim() || !password) {
+      setAuthResult({ ok: false, error: "Host, username, and password are required" });
       return;
     }
 
-    setLoading(true);
-    setResult(null);
+    setChecking(true);
+    setAuthResult(null);
+    try {
+      const res = await checkSmtpAuth({
+        host,
+        port: portNum,
+        security,
+        username,
+        password,
+      });
+      setAuthResult(res);
+    } catch (e) {
+      setAuthResult({
+        ok: false,
+        error: e instanceof Error ? e.message : "Request failed",
+      });
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const onSubmit = async () => {
+    const portNum = parsePort(port);
+    if (portNum === null) {
+      setSendResult({ ok: false, steps: [], error: "Port must be a number between 1 and 65535" });
+      return;
+    }
+
+    setSending(true);
+    setSendResult(null);
     try {
       const res = await testSmtp({
         host,
@@ -102,15 +150,15 @@ export function smtpTester() {
         text,
         html: looksLikeHtml(text),
       });
-      setResult(res);
+      setSendResult(res);
     } catch (e) {
-      setResult({
+      setSendResult({
         ok: false,
         steps: [],
         error: e instanceof Error ? e.message : "Request failed",
       });
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
@@ -122,9 +170,9 @@ export function smtpTester() {
         slug="smtp-tester"
       />
       <CloudGate toolName="SMTP Tester">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:gap-4">
           <Panel title="Your SMTP">
-            <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
+            <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {Object.keys(PRESETS).map((key) => (
                 <Button
                   key={key}
@@ -145,6 +193,7 @@ export function smtpTester() {
                   onChange={(e) => {
                     setHost(e.target.value);
                     setPreset("custom");
+                    setAuthResult(null);
                   }}
                   className="font-mono"
                   placeholder="smtp.example.com"
@@ -161,6 +210,7 @@ export function smtpTester() {
                   onChange={(e) => {
                     setPort(e.target.value.replace(/[^\d]/g, "").slice(0, 5));
                     setPreset("custom");
+                    setAuthResult(null);
                   }}
                   className="font-mono"
                   placeholder="587"
@@ -169,13 +219,13 @@ export function smtpTester() {
               </label>
               <div className="space-y-1 text-sm text-zinc-400 sm:col-span-2">
                 <p>Security</p>
-                <div className="flex flex-wrap gap-2 pt-1">
+                <div className="grid grid-cols-3 gap-2 pt-1 sm:flex sm:flex-wrap">
                   {(["starttls", "ssl", "none"] as const).map((s) => (
                     <Button
                       key={s}
                       type="button"
                       variant={security === s ? "primary" : "outline"}
-                      className="h-9 min-h-9 uppercase"
+                      className="h-9 min-h-9 w-full uppercase sm:w-auto"
                       onClick={() => onSecurityChange(s)}
                     >
                       {s}
@@ -187,7 +237,10 @@ export function smtpTester() {
                 Username
                 <Input
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setAuthResult(null);
+                  }}
                   className="font-mono"
                   autoComplete="username"
                 />
@@ -197,16 +250,74 @@ export function smtpTester() {
                 <Input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setAuthResult(null);
+                  }}
                   className="font-mono"
                   autoComplete="current-password"
                 />
               </label>
             </div>
-            <p className="mt-3 text-xs text-zinc-500">
-              Credentials are sent once to the API for the test and are never stored. Prefer app
-              passwords.
-            </p>
+
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={busy}
+                onClick={() => void onCheckAuth()}
+              >
+                {checking ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Checking…
+                  </>
+                ) : (
+                  <>
+                    <KeyRound className="size-4" />
+                    Test credentials
+                  </>
+                )}
+              </Button>
+              <p className="text-xs leading-relaxed text-zinc-500 sm:max-w-sm sm:text-right">
+                Connect + AUTH only — no email is sent. Credentials are never stored.
+              </p>
+            </div>
+
+            {authResult ? (
+              <div
+                className={cn(
+                  "mt-3 flex gap-3 rounded-2xl border px-3.5 py-3 sm:px-4",
+                  authResult.ok
+                    ? "border-emerald-500/30 bg-emerald-500/10"
+                    : "border-rose-500/30 bg-rose-500/10",
+                )}
+              >
+                {authResult.ok ? (
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
+                ) : (
+                  <XCircle className="mt-0.5 size-5 shrink-0 text-rose-400" />
+                )}
+                <div className="min-w-0 space-y-1">
+                  <p
+                    className={cn(
+                      "text-sm font-medium",
+                      authResult.ok ? "text-emerald-300" : "text-rose-300",
+                    )}
+                  >
+                    {authResult.ok
+                      ? authResult.message || "Credentials accepted"
+                      : authResult.error || "Credential check failed"}
+                  </p>
+                  {authResult.host ? (
+                    <p className="break-all font-mono text-xs text-zinc-400">
+                      {authResult.host}:{authResult.port} · {authResult.security}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
           </Panel>
 
           <Panel title="Test email">
@@ -317,42 +428,72 @@ export function smtpTester() {
               </div>
             </div>
 
-            <div className="mt-3">
+            <div className="mt-4">
               <Button
                 type="button"
                 className="w-full sm:w-auto"
-                disabled={loading}
+                disabled={busy}
                 onClick={() => void onSubmit()}
               >
-                {loading ? "Sending…" : "Send test email"}
+                {sending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    <Send className="size-4" />
+                    Send test email
+                  </>
+                )}
               </Button>
             </div>
           </Panel>
 
-          {result ? (
-            <Panel title="Result">
-              <p
+          {sendResult ? (
+            <Panel title="Send result">
+              <div
                 className={cn(
-                  "mb-3 text-sm font-medium",
-                  result.ok ? "text-emerald-400" : "text-rose-400",
+                  "mb-3 flex gap-3 rounded-2xl border px-3.5 py-3",
+                  sendResult.ok
+                    ? "border-emerald-500/30 bg-emerald-500/10"
+                    : "border-rose-500/30 bg-rose-500/10",
                 )}
               >
-                {result.ok ? "Success — message accepted by SMTP server" : result.error || "Failed"}
-              </p>
-              <ul className="space-y-2">
-                {result.steps.map((s, i) => (
-                  <li
-                    key={`${s.step}-${i}`}
-                    className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-xs"
-                  >
-                    <span className={s.ok ? "text-emerald-400" : "text-rose-400"}>
-                      {s.ok ? "OK" : "FAIL"}
-                    </span>{" "}
-                    <span className="text-zinc-400">{s.step}</span>
-                    <div className="mt-1 whitespace-pre-wrap break-all text-zinc-300">{s.detail}</div>
-                  </li>
-                ))}
-              </ul>
+                {sendResult.ok ? (
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
+                ) : (
+                  <XCircle className="mt-0.5 size-5 shrink-0 text-rose-400" />
+                )}
+                <p
+                  className={cn(
+                    "text-sm font-medium",
+                    sendResult.ok ? "text-emerald-300" : "text-rose-300",
+                  )}
+                >
+                  {sendResult.ok
+                    ? "Success — message accepted by SMTP server"
+                    : sendResult.error || "Failed"}
+                </p>
+              </div>
+              {sendResult.steps.length > 0 ? (
+                <ul className="space-y-2">
+                  {sendResult.steps.map((s, i) => (
+                    <li
+                      key={`${s.step}-${i}`}
+                      className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-xs"
+                    >
+                      <span className={s.ok ? "text-emerald-400" : "text-rose-400"}>
+                        {s.ok ? "OK" : "FAIL"}
+                      </span>{" "}
+                      <span className="text-zinc-400">{s.step}</span>
+                      <div className="mt-1 whitespace-pre-wrap break-all text-zinc-300">
+                        {s.detail}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </Panel>
           ) : null}
         </div>

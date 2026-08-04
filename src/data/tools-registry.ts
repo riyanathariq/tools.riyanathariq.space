@@ -9,7 +9,7 @@ export const toolsRegistry: ToolMeta[] = [
     category: "cloud",
     keywords: ["smtp", "email", "mail", "starttls", "premium"],
     cloud: true,
-    info: "Bring your own SMTP (Gmail app password, SES, SendGrid, etc.). The Go API connects and sends once — credentials are not stored. Sign-in required. Rate limited.",
+    info: "Bring your own SMTP (Gmail app password, SES, SendGrid, etc.). Test credentials (AUTH only) or send a real message. Credentials are not stored. Sign-in required. Rate limited.",
   },
   {
     slug: "webhook-bin",
