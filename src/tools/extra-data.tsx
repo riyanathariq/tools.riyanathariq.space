@@ -1,8 +1,10 @@
 "use client";
 
 import { parse as parseGraphQL, print } from "graphql";
+import hljs from "highlight.js/lib/common";
 import { dump, load } from "js-yaml";
-import { marked } from "marked";
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
 import { useEffect, useMemo, useState } from "react";
 import { parse as parseToml, TomlError } from "smol-toml";
 
@@ -18,13 +20,36 @@ import {
   TextIO,
   ToolHeader,
 } from "@/components/tool-workspace";
+import { MARKDOWN_SAMPLE } from "@/data/markdown-preview-sample";
 import { getToolBySlug } from "@/data/tools-registry";
+
+import "highlight.js/styles/github-dark.css";
 
 const textareaClass =
   "min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
 
+const mdMarked = new Marked(
+  markedHighlight({
+    langPrefix: "hljs language-",
+    emptyLangClass: "hljs",
+    highlight(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, { language: lang }).value;
+      }
+      return hljs.highlightAuto(code).value;
+    },
+  }),
+  {
+    gfm: true,
+    breaks: false,
+  },
+);
+
 function stripScriptTags(html: string): string {
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/\son\w+="[^"]*"/gi, "")
+    .replace(/\son\w+='[^']*'/gi, "");
 }
 
 function parseEnv(text: string): Record<string, string> {
@@ -56,18 +81,6 @@ function parseOpenApiInput(input: string): unknown {
   if (trimmed.startsWith("{")) return JSON.parse(trimmed);
   return load(trimmed);
 }
-
-const MARKDOWN_SAMPLE = `# Hello Markdown
-
-Write **bold**, *italic*, and \`code\`.
-
-- Item one
-- Item two
-
-\`\`\`js
-console.log("preview");
-\`\`\`
-`;
 
 const YAML_JSON_SAMPLE = `name: Ada
 version: 1
@@ -143,7 +156,7 @@ export function markdownPreview() {
   const html = useMemo(() => {
     if (!input.trim()) return "";
     try {
-      const raw = marked.parse(input, { async: false }) as string;
+      const raw = mdMarked.parse(input, { async: false }) as string;
       return stripScriptTags(raw);
     } catch {
       return "";
@@ -157,7 +170,7 @@ export function markdownPreview() {
         description={meta?.description ?? "Live Markdown preview with HTML output."}
         slug="markdown-preview"
       />
-      <div className="flex min-h-[28rem] flex-col gap-3">
+      <div className="flex min-h-[32rem] flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
           <SampleButton onClick={() => setInput(MARKDOWN_SAMPLE)} />
           <CopyButton value={input} />
@@ -169,14 +182,18 @@ export function markdownPreview() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Write Markdown…"
-              className={textareaClass}
+              spellCheck={false}
+              className={`${textareaClass} min-h-[22rem] lg:min-h-[32rem]`}
             />
           </Panel>
           <Panel title="Preview">
-            <div
-              className="prose prose-invert prose-sm max-w-none min-h-[16rem] overflow-auto rounded-xl bg-zinc-950 p-3 text-zinc-200 lg:min-h-[20rem] [&_a]:text-emerald-400 [&_code]:rounded [&_code]:bg-zinc-900 [&_code]:px-1 [&_pre]:bg-zinc-900"
-              dangerouslySetInnerHTML={{ __html: html || "<p class='text-zinc-500'>Preview appears here…</p>" }}
-            />
+            <div className="min-h-[22rem] overflow-auto rounded-xl border border-zinc-800/80 bg-[#0c0c0e] p-4 sm:p-5 lg:min-h-[32rem]">
+              {html ? (
+                <div className="md-preview" dangerouslySetInnerHTML={{ __html: html }} />
+              ) : (
+                <p className="text-sm text-zinc-500">Preview appears here…</p>
+              )}
+            </div>
           </Panel>
         </div>
       </div>

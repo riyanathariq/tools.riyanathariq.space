@@ -322,7 +322,7 @@ export const toolsRegistry: ToolMeta[] = [
     description: "Edit Markdown and preview rendered HTML locally.",
     category: "data",
     keywords: ["markdown", "md", "preview"],
-    info: "Renders Markdown in your browser with basic script stripping. Not a full CommonMark/GFM security sanitizer for untrusted content.",
+    info: "GFM Markdown preview with tables, fenced code, and syntax highlighting (Highlight.js). Runs in-browser with basic script stripping — not a full sanitizer for untrusted content.",
   },
   {
     slug: "yaml-json",
