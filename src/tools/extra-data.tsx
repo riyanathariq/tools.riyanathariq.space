@@ -1,6 +1,5 @@
 "use client";
 
-import { parse as parseGraphQL, print } from "graphql";
 import hljs from "highlight.js/lib/common";
 import { dump, load } from "js-yaml";
 import { Marked } from "marked";
@@ -109,14 +108,6 @@ port = 8080
 [database]
 name = "app"
 `;
-
-const GRAPHQL_SAMPLE = `query GetUser($id: ID!) {
-  user(id: $id) {
-    id
-    name
-    email
-  }
-}`;
 
 const OPENAPI_SAMPLE = `openapi: 3.0.0
 info:
@@ -346,61 +337,6 @@ export function envToml() {
               TOML → JSON
             </Button>
             <SampleButton onClick={() => setInput(tab === "env" ? ENV_SAMPLE : TOML_SAMPLE)} />
-          </>
-        }
-      />
-    </>
-  );
-}
-
-export function graphqlFormat() {
-  const meta = getToolBySlug("graphql-format");
-  const [input, setInput] = useState(GRAPHQL_SAMPLE);
-  const [minify, setMinify] = useState(false);
-  const [output, setOutput] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!input.trim()) {
-      setOutput("");
-      setError(null);
-      return;
-    }
-    try {
-      const ast = parseGraphQL(input);
-      const formatted = print(ast);
-      setOutput(minify ? formatted.replace(/\s+/g, " ").trim() : formatted);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Invalid GraphQL");
-      setOutput("");
-    }
-  }, [input, minify]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "GraphQL Format"}
-        description={meta?.description ?? "Pretty-print or minify GraphQL queries."}
-        slug="graphql-format"
-      />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        inputLabel="GraphQL"
-        outputFilename="query.graphql"
-        error={error}
-        options={
-          <>
-            <Button type="button" variant={!minify ? "primary" : "outline"} onClick={() => setMinify(false)}>
-              Pretty
-            </Button>
-            <Button type="button" variant={minify ? "primary" : "outline"} onClick={() => setMinify(true)}>
-              Minify
-            </Button>
-            <SampleButton onClick={() => setInput(GRAPHQL_SAMPLE)} />
           </>
         }
       />

@@ -24,19 +24,11 @@ export const toolsRegistry: ToolMeta[] = [
   // Encoding
   {
     slug: "base64",
-    name: "Base64 Encoding",
-    description: "Encode and decode Base64 from text or any file, with preview.",
+    name: "Base64 / Base32",
+    description: "Encode and decode Base64 (text/file) or Base32 strings.",
     category: "encoding",
-    keywords: ["base64", "encode", "decode", "file"],
-    info: "Text mode encodes UTF-8 strings. File mode reads any binary file into Base64 (optional Data URL) and can decode Base64 back to a downloadable file with image/text/PDF preview when possible. Large files (>~8MB) may strain the browser tab.",
-  },
-  {
-    slug: "base32",
-    name: "Base32 Encoding",
-    description: "Encode and decode Base32 strings.",
-    category: "encoding",
-    keywords: ["base32"],
-    info: "Uses the RFC 4648 Base32 alphabet (A–Z, 2–7). Handy for case-insensitive tokens and some TOTP secrets. Padding with '=' is accepted on decode.",
+    keywords: ["base64", "base32", "encode", "decode", "file"],
+    info: "Base64 text mode encodes UTF-8 strings. File mode reads any binary file into Base64 (optional Data URL) and can decode back to a downloadable file with preview when possible. Base32 tab uses the RFC 4648 alphabet (A–Z, 2–7). Large files (>~8MB) may strain the browser tab.",
   },
   {
     slug: "url-encoding",
@@ -45,22 +37,6 @@ export const toolsRegistry: ToolMeta[] = [
     category: "encoding",
     keywords: ["url", "percent", "uri"],
     info: "Uses encodeURIComponent / decodeURIComponent semantics for path/query-safe encoding. Does not rewrite full URLs component-by-component — paste the fragment you need encoded.",
-  },
-  {
-    slug: "url-base64",
-    name: "URL Base64 Encoding",
-    description: "URL-safe Base64 encode and decode.",
-    category: "encoding",
-    keywords: ["base64url"],
-    info: "URL-safe Base64 replaces +/ with -_ and often omits padding. For binary files prefer the main Base64 tool File mode.",
-  },
-  {
-    slug: "mime-base64",
-    name: "MIME Base64 Encoding",
-    description: "Base64 with MIME line wrapping (76 chars).",
-    category: "encoding",
-    keywords: ["mime", "base64"],
-    info: "Wraps Base64 at 76 characters per line (MIME / PEM style). Decode strips whitespace. For arbitrary files use the Base64 File mode.",
   },
   {
     slug: "html-entities",
@@ -72,35 +48,11 @@ export const toolsRegistry: ToolMeta[] = [
   },
   {
     slug: "json-escape",
-    name: "JSON String Escaping",
-    description: "Escape and unescape JSON string literals.",
+    name: "String Escaping",
+    description: "Escape JSON string literals or convert escape sequences.",
     category: "encoding",
-    keywords: ["json", "escape"],
-    info: "Escapes a string so it can sit inside JSON quotes (\\\\, \\\", control chars). Unescape reverses JSON string escapes — not a full JSON prettier.",
-  },
-  {
-    slug: "xml-escape",
-    name: "XML Text Escaping",
-    description: "Escape and unescape XML text.",
-    category: "encoding",
-    keywords: ["xml"],
-    info: "Escapes &, <, >, \", and ' for XML text nodes/attributes. Unescape reverses common XML entities.",
-  },
-  {
-    slug: "csv-escape",
-    name: "CSV Text Escaping",
-    description: "Escape and unescape CSV fields.",
-    category: "encoding",
-    keywords: ["csv"],
-    info: "Quotes fields and doubles internal quotes per common CSV rules. Unescape removes surrounding quotes and undoubles quotes.",
-  },
-  {
-    slug: "escape-sequences",
-    name: "Escape Sequences",
-    description: "Convert between raw text and escape sequences.",
-    category: "encoding",
-    keywords: ["escape", "unicode"],
-    info: "Converts between visible escape sequences (\\\\n, \\\\t, \\\\uXXXX) and raw characters. Useful when debugging logged strings.",
+    keywords: ["json", "escape", "unicode", "sequences"],
+    info: "JSON tab escapes a string for JSON quotes (\\\\, \\\", control chars). Escape-sequences tab converts between visible escapes (\\\\n, \\\\t, \\\\uXXXX) and raw characters. Not a full JSON prettier.",
   },
 
   // Crypto
@@ -156,11 +108,11 @@ export const toolsRegistry: ToolMeta[] = [
   // IDs & time
   {
     slug: "uuid",
-    name: "UUID",
-    description: "Generate and validate UUIDs (v4 and v7).",
+    name: "UUID / Nano ID",
+    description: "Generate and validate UUIDs (v4/v7), or create Nano IDs.",
     category: "ids",
-    keywords: ["uuid", "guid", "v4", "v7"],
-    info: "Generate random UUIDv4 or time-ordered UUIDv7, including bulk. Validate newline-separated values and inspect version/variant (and v7 timestamp when present).",
+    keywords: ["uuid", "guid", "v4", "v7", "nanoid"],
+    info: "Generate random UUIDv4 or time-ordered UUIDv7, including bulk. Validate newline-separated UUIDs and inspect version/variant (and v7 timestamp when present). Nano ID tab creates compact URL-safe IDs with configurable size.",
   },
   {
     slug: "ulid",
@@ -169,14 +121,6 @@ export const toolsRegistry: ToolMeta[] = [
     category: "ids",
     keywords: ["ulid"],
     info: "ULIDs are 26 Crockford Base32 chars, sortable by time. Bulk generate, validate, and decode the embedded millisecond timestamp.",
-  },
-  {
-    slug: "nanoid",
-    name: "Nano ID",
-    description: "Generate compact URL-friendly unique IDs.",
-    category: "ids",
-    keywords: ["nanoid"],
-    info: "URL-safe IDs with configurable size. Collision risk depends on length and volume — use longer IDs for high cardinality.",
   },
   {
     slug: "cron",
@@ -193,14 +137,6 @@ export const toolsRegistry: ToolMeta[] = [
     category: "ids",
     keywords: ["unix", "timestamp", "iso"],
     info: "Bidirectional converter between Unix seconds/ms and calendar fields in a chosen IANA timezone. Format presets are for display/copy. Month/year averages are approximate when used as units elsewhere.",
-  },
-  {
-    slug: "uuid-ulid",
-    name: "UUID ↔ ULID",
-    description: "Convert between UUID and ULID formats.",
-    category: "ids",
-    keywords: ["uuid", "ulid", "convert"],
-    info: "Converts valid UUIDs to ULIDs and back using the shared 128-bit layout. Invalid input shows a clear error — does not invent timestamps.",
   },
   {
     slug: "timezone-planner",
@@ -229,14 +165,6 @@ export const toolsRegistry: ToolMeta[] = [
     info: "Lightweight path queries (dot/bracket). Not a full JSONPath RFC implementation — keep expressions simple.",
   },
   {
-    slug: "json-schema",
-    name: "JSON Schema",
-    description: "Validate JSON against a schema (basic draft checks).",
-    category: "data",
-    keywords: ["schema", "validate"],
-    info: "Basic type/required/properties checks only — not a full Ajv/draft-2020 validator. Good for quick sanity checks.",
-  },
-  {
     slug: "regex",
     name: "Regular Expression",
     description: "Test regex patterns with live match groups.",
@@ -261,36 +189,12 @@ export const toolsRegistry: ToolMeta[] = [
     info: "Converts identifiers between common cases. Multi-word input is split on non-alphanumerics; results may need manual tweaks for acronyms.",
   },
   {
-    slug: "text-statistic",
-    name: "Text Statistic",
-    description: "Count characters, words, lines, and bytes.",
+    slug: "text-toolkit",
+    name: "Text Toolkit",
+    description: "Stats, filter, sort, and format text lines in one place.",
     category: "data",
-    keywords: ["count", "words"],
-    info: "Counts characters (with/without spaces), words, lines, and UTF-8 bytes. Word boundaries follow simple whitespace splitting.",
-  },
-  {
-    slug: "text-filter",
-    name: "Text Filter",
-    description: "Filter lines by include/exclude patterns.",
-    category: "data",
-    keywords: ["filter", "grep"],
-    info: "Keep or drop lines matching a substring or regex. Case-insensitive option available. Processes one line at a time.",
-  },
-  {
-    slug: "text-sorting",
-    name: "Text Sorting",
-    description: "Sort lines alphabetically or numerically.",
-    category: "data",
-    keywords: ["sort"],
-    info: "Sorts by line (one entry per newline). A single long line will not change — split into lines first. Supports A→Z, Z→A, and numeric.",
-  },
-  {
-    slug: "text-format",
-    name: "Text Format",
-    description: "Trim, wrap, dedupe, and normalize whitespace.",
-    category: "data",
-    keywords: ["trim", "format"],
-    info: "Trim ends, collapse whitespace, wrap lines, or dedupe identical lines. Non-destructive preview via output panel.",
+    keywords: ["count", "words", "filter", "grep", "sort", "trim", "format"],
+    info: "Four modes: character/word/line/byte stats; include/exclude line filter; alphabetical or numeric sort with unique option; trim/collapse/dedupe formatting. Runs entirely in-browser.",
   },
   {
     slug: "sql-format",
@@ -307,14 +211,6 @@ export const toolsRegistry: ToolMeta[] = [
     category: "data",
     keywords: ["lorem", "placeholder"],
     info: "Generates placeholder Latin-ish paragraphs. Set paragraph count and min/max words so lengths vary instead of identical copies.",
-  },
-  {
-    slug: "code-format",
-    name: "Code Style Formatting",
-    description: "Format JSON, JS-ish objects, and CSS-ish blocks lightly.",
-    category: "data",
-    keywords: ["prettier", "format", "code"],
-    info: "Lightweight formatting helpers — not a full Prettier/ESLint pipeline. Best for JSON and small snippets.",
   },
   {
     slug: "markdown-preview",
@@ -341,14 +237,6 @@ export const toolsRegistry: ToolMeta[] = [
     info: "Parses KEY=VALUE env lines and TOML documents into JSON for inspection. Does not execute shell expansions.",
   },
   {
-    slug: "graphql-format",
-    name: "GraphQL Format",
-    description: "Pretty-print or minify GraphQL documents.",
-    category: "data",
-    keywords: ["graphql", "gql", "format"],
-    info: "Uses the graphql package to parse and print queries/mutations. Invalid GraphQL shows a parse error.",
-  },
-  {
     slug: "openapi-viewer",
     name: "OpenAPI Viewer",
     description: "Paste OpenAPI 3 JSON/YAML and list paths and methods.",
@@ -365,14 +253,6 @@ export const toolsRegistry: ToolMeta[] = [
     category: "http",
     keywords: ["curl", "http", "fetch", "converter"],
     info: "Parses common curl flags (-X, -H, -d, -u, URL) and generates client snippets. Does not execute the request from the browser. Complex shell expansions may not parse.",
-  },
-  {
-    slug: "cli-helpers",
-    name: "CLI Command Helpers",
-    description: "Quick encode/quote helpers for shell commands.",
-    category: "http",
-    keywords: ["cli", "shell", "bash"],
-    info: "Helpers for shell quoting and escaping. Quote style (single/double) changes which characters need escaping.",
   },
   {
     slug: "url-parser",
@@ -411,10 +291,10 @@ export const toolsRegistry: ToolMeta[] = [
   {
     slug: "image-converter",
     name: "Image Converter",
-    description: "Convert and resize images in your browser.",
+    description: "Convert, resize, or generate favicon PNGs in your browser.",
     category: "media",
-    keywords: ["image", "png", "jpeg", "webp"],
-    info: "Upload or drop an image, optionally resize, and export PNG/JPEG/WebP via canvas. Processing stays local; very large images may be memory-heavy.",
+    keywords: ["image", "png", "jpeg", "webp", "favicon", "icon"],
+    info: "Convert tab: upload/drop an image, optionally resize, export PNG/JPEG/WebP via canvas. Favicon tab: export common sizes (16–180) as PNG. Processing stays local; very large images may be memory-heavy.",
   },
   {
     slug: "qr-code",
@@ -440,15 +320,6 @@ export const toolsRegistry: ToolMeta[] = [
     keywords: ["svg", "png", "vector"],
     info: "Paste or upload SVG, preview, download SVG, or rasterize to PNG via canvas. Complex filters/fonts may differ from desktop renderers.",
   },
-  {
-    slug: "favicon-generator",
-    name: "Favicon Generator",
-    description: "Generate multi-size favicon PNGs from an image.",
-    category: "media",
-    keywords: ["favicon", "icon", "png"],
-    info: "Upload a square-ish image and export common favicon sizes (16–180). Pure PNG downloads — no .ico packer.",
-  },
-
   // Misc
   {
     slug: "units-converter",
@@ -459,28 +330,12 @@ export const toolsRegistry: ToolMeta[] = [
     info: "Tabbed live converter: editing one field updates the rest. Time/data-size use exact binary or SI factors as labeled. Calendar month/year averages are approximate.",
   },
   {
-    slug: "ascii-encoding",
-    name: "ASCII Encoding",
-    description: "Convert text to ASCII codes and back.",
-    category: "misc",
-    keywords: ["ascii"],
-    info: "Maps characters to code points (decimal/hex). Non-ASCII input may show extended codes — stick to ASCII for classic tables.",
-  },
-  {
     slug: "ascii-art",
     name: "ASCII Art",
     description: "Render text as FIGlet-style ASCII art.",
     category: "misc",
     keywords: ["ascii", "art", "banner", "figlet"],
     info: "Renders banner text with a curated set of FIGlet fonts. Very long input may produce huge output — keep phrases short.",
-  },
-  {
-    slug: "rubber-duck",
-    name: "Rubber Duck",
-    description: "Talk through a bug — local scratchpad, nothing leaves your device.",
-    category: "misc",
-    keywords: ["debug", "duck"],
-    info: "A private scratchpad for rubber-duck debugging. Text stays in memory/local UI only — nothing is uploaded.",
   },
 ];
 

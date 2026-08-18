@@ -21,15 +21,9 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
 
     // Encoding
     case "base64":
-    case "base32":
     case "url-encoding":
-    case "url-base64":
-    case "mime-base64":
     case "html-entities":
     case "json-escape":
-    case "xml-escape":
-    case "csv-escape":
-    case "escape-sequences":
       return pickComponent(await import("@/tools/encoding"), slug);
 
     // Crypto
@@ -45,40 +39,31 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     // IDs & time
     case "uuid":
     case "ulid":
-    case "nanoid":
     case "cron":
     case "datetime":
       return pickComponent(await import("@/tools/ids"), slug);
-    case "uuid-ulid":
     case "timezone-planner":
       return pickComponent(await import("@/tools/extra-ids"), slug);
 
     // Data & text
     case "json-prettier":
     case "json-path":
-    case "json-schema":
     case "regex":
     case "text-diff":
     case "text-case":
-    case "text-statistic":
-    case "text-filter":
-    case "text-sorting":
-    case "text-format":
+    case "text-toolkit":
     case "sql-format":
     case "lorem-ipsum":
-    case "code-format":
       return pickComponent(await import("@/tools/data"), slug);
     case "markdown-preview":
     case "yaml-json":
     case "env-toml":
-    case "graphql-format":
     case "openapi-viewer":
     case "url-parser":
       return pickComponent(await import("@/tools/extra-data"), slug);
 
     // HTTP & CLI
     case "curl-explainer":
-    case "cli-helpers":
       return pickComponent(await import("@/tools/http"), slug);
     case "cidr-calculator":
     case "chmod-calculator":
@@ -93,14 +78,11 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     case "color-picker":
       return pickComponent(await import("@/tools/color-picker"), slug);
     case "svg-converter":
-    case "favicon-generator":
       return pickComponent(await import("@/tools/extra-media"), slug);
 
     // Misc
     case "units-converter":
-    case "ascii-encoding":
     case "ascii-art":
-    case "rubber-duck":
       return pickComponent(await import("@/tools/misc"), slug);
 
     default:

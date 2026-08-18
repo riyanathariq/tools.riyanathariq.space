@@ -10,7 +10,6 @@ import {
   CopyButton,
   DownloadButton,
   Panel,
-  TextIO,
   ToolHeader,
 } from "@/components/tool-workspace";
 import { getToolBySlug } from "@/data/tools-registry";
@@ -322,85 +321,6 @@ export function unitsConverter() {
   );
 }
 
-const DUCK_PROMPTS = [
-  "What did I expect to happen?",
-  "What actually happened?",
-  "What changed since it last worked?",
-  "What is the smallest test case?",
-  "What assumptions am I making?",
-];
-
-const STORAGE_KEY = "rubber-duck-notes";
-
-export function asciiEncoding() {
-  const meta = getToolBySlug("ascii-encoding");
-  const [input, setInput] = useState("Hi");
-  const [mode, setMode] = useState<"to-dec" | "to-hex" | "from-codes">("to-dec");
-  const [error, setError] = useState<string | null>(null);
-
-  const output = useMemo(() => {
-    if (!input) return "";
-    try {
-      setError(null);
-      if (mode === "to-dec") {
-        return [...input].map((c) => c.charCodeAt(0)).join(" ");
-      }
-      if (mode === "to-hex") {
-        return [...input].map((c) => c.charCodeAt(0).toString(16).padStart(2, "0")).join(" ");
-      }
-      const parts = input.trim().split(/[\s,]+/);
-      const codes = parts.map((p) => (p.startsWith("0x") ? parseInt(p, 16) : Number(p)));
-      if (codes.some((n) => Number.isNaN(n))) throw new Error("Invalid code list");
-      return String.fromCharCode(...codes);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Conversion failed");
-      return "";
-    }
-  }, [input, mode]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "ASCII Encoding"}
-        description={meta?.description ?? ""}
-        slug="ascii-encoding"
-      />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        error={error}
-        options={
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant={mode === "to-dec" ? "primary" : "outline"}
-              onClick={() => setMode("to-dec")}
-            >
-              Text → decimal
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "to-hex" ? "primary" : "outline"}
-              onClick={() => setMode("to-hex")}
-            >
-              Text → hex
-            </Button>
-            <Button
-              type="button"
-              variant={mode === "from-codes" ? "primary" : "outline"}
-              onClick={() => setMode("from-codes")}
-            >
-              Codes → text
-            </Button>
-          </div>
-        }
-      />
-    </>
-  );
-}
-
 export function asciiArt() {
   const meta = getToolBySlug("ascii-art");
   const [input, setInput] = useState("HELLO");
@@ -460,59 +380,3 @@ export function asciiArt() {
   );
 }
 
-export function rubberDuck() {
-  const meta = getToolBySlug("rubber-duck");
-  const [notes, setNotes] = useState("");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setNotes(saved);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, notes);
-    } catch {
-      /* ignore */
-    }
-  }, [notes]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "Rubber Duck"}
-        description={meta?.description ?? ""}
-        slug="rubber-duck"
-      />
-      <div className="grid gap-3 lg:grid-cols-[1fr,16rem]">
-        <Panel title="Scratchpad">
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Explain the problem out loud…"
-            className="min-h-[20rem] border-0 bg-zinc-950 p-0 focus:ring-0"
-          />
-        </Panel>
-        <Panel title="Prompts">
-          <ul className="space-y-2 text-sm text-zinc-400">
-            {DUCK_PROMPTS.map((p) => (
-              <li key={p}>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-left hover:border-emerald-500/30"
-                  onClick={() => setNotes((n) => (n ? `${n}\n\n${p}\n` : `${p}\n`))}
-                >
-                  {p}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Panel>
-      </div>
-    </>
-  );
-}

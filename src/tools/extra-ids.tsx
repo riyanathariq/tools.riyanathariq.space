@@ -1,7 +1,6 @@
 "use client";
 
-import { isValid as isValidUlid, ulidToUUID, uuidToULID } from "ulid";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +8,9 @@ import {
   ClearButton,
   CopyButton,
   Panel,
-  SampleButton,
   ToolHeader,
 } from "@/components/tool-workspace";
 import { getToolBySlug } from "@/data/tools-registry";
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const TIMEZONE_OPTIONS = [
   "UTC",
@@ -36,12 +31,6 @@ const TIMEZONE_OPTIONS = [
 ];
 
 const DEFAULT_ZONES = ["Asia/Jakarta", "UTC", "America/New_York"] as const;
-
-type ConvertDir = "uuid-to-ulid" | "ulid-to-uuid";
-
-function isValidUuid(value: string): boolean {
-  return UUID_RE.test(value.trim());
-}
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -124,130 +113,6 @@ function offsetLabel(date: Date, timeZone: string): string {
   const sign = offsetMin >= 0 ? "+" : "-";
   const abs = Math.abs(offsetMin);
   return `UTC${sign}${pad2(Math.floor(abs / 60))}:${pad2(abs % 60)}`;
-}
-
-export function uuidUlid() {
-  const meta = getToolBySlug("uuid-ulid");
-  const [direction, setDirection] = useState<ConvertDir>("uuid-to-ulid");
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [valid, setValid] = useState<boolean | null>(null);
-
-  const convert = useCallback(() => {
-    const value = input.trim();
-    if (!value) {
-      setOutput("");
-      setError(null);
-      setValid(null);
-      return;
-    }
-    try {
-      if (direction === "uuid-to-ulid") {
-        if (!isValidUuid(value)) {
-          setValid(false);
-          throw new Error("Invalid UUID format");
-        }
-        setValid(true);
-        setOutput(uuidToULID(value));
-      } else {
-        const normalized = value.toUpperCase();
-        if (!isValidUlid(normalized)) {
-          setValid(false);
-          throw new Error("Invalid ULID (26 Crockford Base32 characters)");
-        }
-        setValid(true);
-        setOutput(ulidToUUID(normalized));
-      }
-      setError(null);
-    } catch (e) {
-      setOutput("");
-      setError(e instanceof Error ? e.message : "Conversion failed");
-    }
-  }, [input, direction]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "UUID ↔ ULID"}
-        description={meta?.description ?? "Convert and validate UUID and ULID values."}
-        slug="uuid-ulid"
-      />
-      <div className="flex min-h-[20rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          {(
-            [
-              ["uuid-to-ulid", "UUID → ULID"],
-              ["ulid-to-uuid", "ULID → UUID"],
-            ] as const
-          ).map(([key, label]) => (
-            <Button
-              key={key}
-              type="button"
-              variant={direction === key ? "primary" : "outline"}
-              onClick={() => setDirection(key)}
-            >
-              {label}
-            </Button>
-          ))}
-          <SampleButton
-            label="Sample UUID"
-            onClick={() => {
-              setDirection("uuid-to-ulid");
-              setInput(crypto.randomUUID());
-            }}
-          />
-          <SampleButton
-            label="Sample ULID"
-            onClick={() => {
-              setDirection("ulid-to-uuid");
-              setInput(uuidToULID(crypto.randomUUID()));
-            }}
-          />
-          <ClearButton onClick={() => {
-            setInput("");
-            setOutput("");
-            setError(null);
-            setValid(null);
-          }} />
-        </div>
-
-        <Panel title="Input">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={direction === "uuid-to-ulid" ? "550e8400-e29b-41d4-a716-446655440000" : "01ARZ3NDEKTSV4RRFFQ69G5FAV"}
-            className="font-mono"
-          />
-          <Button type="button" className="mt-3" onClick={convert}>
-            Convert
-          </Button>
-        </Panel>
-
-        {valid !== null ? (
-          <p
-            className={
-              valid
-                ? "text-sm text-emerald-400"
-                : "text-sm text-rose-400"
-            }
-          >
-            {valid ? "Valid input format" : "Invalid input format"}
-          </p>
-        ) : null}
-
-        {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
-            {error}
-          </p>
-        ) : null}
-
-        <Panel title="Output" actions={output ? <CopyButton value={output} /> : undefined}>
-          <p className="break-all font-mono text-sm text-emerald-300">{output || "—"}</p>
-        </Panel>
-      </div>
-    </>
-  );
 }
 
 export function timezonePlanner() {

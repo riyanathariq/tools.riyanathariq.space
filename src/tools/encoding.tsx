@@ -14,6 +14,7 @@ import {
   TextIO,
   ToolHeader,
 } from "@/components/tool-workspace";
+import { getToolBySlug } from "@/data/tools-registry";
 import { cn, downloadBlob } from "@/lib/utils";
 
 type Mode = "encode" | "decode";
@@ -643,25 +644,6 @@ function base32Decode(text: string): string {
   return bytesToUtf8(new Uint8Array(bytes));
 }
 
-function urlBase64Encode(text: string): string {
-  return base64Encode(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function urlBase64Decode(text: string): string {
-  let b64 = text.replace(/-/g, "+").replace(/_/g, "/");
-  while (b64.length % 4) b64 += "=";
-  return base64Decode(b64);
-}
-
-function mimeBase64Encode(text: string): string {
-  const b64 = base64Encode(text);
-  return b64.replace(/.{1,76}/g, (line) => line + "\n").trim();
-}
-
-function mimeBase64Decode(text: string): string {
-  return base64Decode(text.replace(/\s/g, ""));
-}
-
 const HTML_ENTITIES: Record<string, string> = {
   "&": "&amp;",
   "<": "&lt;",
@@ -693,39 +675,6 @@ function jsonEscapeDecode(text: string): string {
   return JSON.parse(
     `"${text.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")}"`,
   ) as string;
-}
-
-function xmlEscapeEncode(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-function xmlEscapeDecode(text: string): string {
-  return text
-    .replace(/&apos;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&gt;/g, ">")
-    .replace(/&lt;/g, "<")
-    .replace(/&amp;/g, "&");
-}
-
-function csvEscapeEncode(text: string): string {
-  if (/[",\n\r]/.test(text)) {
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-  return text;
-}
-
-function csvEscapeDecode(text: string): string {
-  const trimmed = text.trim();
-  if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-    return trimmed.slice(1, -1).replace(/""/g, '"');
-  }
-  return text;
 }
 
 function escapeSequencesEncode(text: string): string {
@@ -766,28 +715,36 @@ function escapeSequencesDecode(text: string): string {
   );
 }
 
-type Base64Tab = "text" | "file";
+type Base64Tab = "text" | "file" | "base32";
 
 export function base64() {
+  const meta = getToolBySlug("base64");
   const [tab, setTab] = useState<Base64Tab>("text");
 
   return (
     <>
       <ToolHeader
         slug="base64"
-        name="Base64 Encoding"
-        description="Encode and decode Base64 from text or any file, with preview."
+        name={meta?.name ?? "Base64 / Base32"}
+        description={
+          meta?.description ?? "Encode and decode Base64 (text/file) or Base32 strings."
+        }
       />
       <div className="mb-3 flex flex-wrap gap-2">
-        {(["text", "file"] as const).map((t) => (
+        {(
+          [
+            ["text", "Base64 text"],
+            ["file", "Base64 file"],
+            ["base32", "Base32"],
+          ] as const
+        ).map(([key, label]) => (
           <Button
-            key={t}
+            key={key}
             type="button"
-            variant={tab === t ? "primary" : "outline"}
-            onClick={() => setTab(t)}
-            className="capitalize"
+            variant={tab === key ? "primary" : "outline"}
+            onClick={() => setTab(key)}
           >
-            {t}
+            {label}
           </Button>
         ))}
       </div>
@@ -802,24 +759,21 @@ export function base64() {
           decode={base64Decode}
           outputFilename="base64.txt"
         />
-      ) : (
+      ) : tab === "file" ? (
         <Base64FileTool />
+      ) : (
+        <CodecTool
+          hideHeader
+          title="Base32 Encoding"
+          description="Encode and decode Base32 strings."
+          slug="base64"
+          sample="Hello, Base32!"
+          encode={base32Encode}
+          decode={base32Decode}
+          outputFilename="base32.txt"
+        />
       )}
     </>
-  );
-}
-
-export function base32() {
-  return (
-    <CodecTool
-      title="Base32 Encoding"
-      description="Encode and decode Base32 strings."
-      slug="base32"
-      sample="Hello, Base32!"
-      encode={base32Encode}
-      decode={base32Decode}
-      outputFilename="base32.txt"
-    />
   );
 }
 
@@ -833,34 +787,6 @@ export function urlEncoding() {
       encode={(s) => encodeURIComponent(s)}
       decode={(s) => decodeURIComponent(s)}
       outputFilename="url-encoded.txt"
-    />
-  );
-}
-
-export function urlBase64() {
-  return (
-    <CodecTool
-      title="URL Base64 Encoding"
-      description="URL-safe Base64 encode and decode."
-      slug="url-base64"
-      sample="Hello, URL-safe!"
-      encode={urlBase64Encode}
-      decode={urlBase64Decode}
-      outputFilename="base64url.txt"
-    />
-  );
-}
-
-export function mimeBase64() {
-  return (
-    <CodecTool
-      title="MIME Base64 Encoding"
-      description="Base64 with MIME line wrapping (76 chars)."
-      slug="mime-base64"
-      sample="Hello, MIME wrap!"
-      encode={mimeBase64Encode}
-      decode={mimeBase64Decode}
-      outputFilename="mime-base64.txt"
     />
   );
 }
@@ -879,58 +805,61 @@ export function htmlEntities() {
   );
 }
 
+type JsonEscapeTab = "json" | "sequences";
+
 export function jsonEscape() {
-  return (
-    <CodecTool
-      title="JSON String Escaping"
-      description="Escape and unescape JSON string literals."
-      slug="json-escape"
-      sample={'Line1\nLine2\t"quoted"'}
-      encode={jsonEscapeEncode}
-      decode={jsonEscapeDecode}
-      outputFilename="json-escape.txt"
-    />
-  );
-}
+  const meta = getToolBySlug("json-escape");
+  const [tab, setTab] = useState<JsonEscapeTab>("json");
 
-export function xmlEscape() {
   return (
-    <CodecTool
-      title="XML Text Escaping"
-      description="Escape and unescape XML text."
-      slug="xml-escape"
-      sample={'<tag attr="value">text & more</tag>'}
-      encode={xmlEscapeEncode}
-      decode={xmlEscapeDecode}
-      outputFilename="xml-escape.txt"
-    />
-  );
-}
-
-export function csvEscape() {
-  return (
-    <CodecTool
-      title="CSV Text Escaping"
-      description="Escape and unescape CSV fields."
-      slug="csv-escape"
-      sample={'Say "Hello", world'}
-      encode={csvEscapeEncode}
-      decode={csvEscapeDecode}
-      outputFilename="csv-escape.txt"
-    />
-  );
-}
-
-export function escapeSequences() {
-  return (
-    <CodecTool
-      title="Escape Sequences"
-      description="Convert between raw text and escape sequences."
-      slug="escape-sequences"
-      sample={"Hello\nWorld\t!"}
-      encode={escapeSequencesEncode}
-      decode={escapeSequencesDecode}
-      outputFilename="escapes.txt"
-    />
+    <>
+      <ToolHeader
+        slug="json-escape"
+        name={meta?.name ?? "String Escaping"}
+        description={
+          meta?.description ?? "Escape JSON string literals or convert escape sequences."
+        }
+      />
+      <div className="mb-3 flex flex-wrap gap-2">
+        {(
+          [
+            ["json", "JSON string"],
+            ["sequences", "Escape sequences"],
+          ] as const
+        ).map(([key, label]) => (
+          <Button
+            key={key}
+            type="button"
+            variant={tab === key ? "primary" : "outline"}
+            onClick={() => setTab(key)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+      {tab === "json" ? (
+        <CodecTool
+          hideHeader
+          title="JSON String Escaping"
+          description="Escape and unescape JSON string literals."
+          slug="json-escape"
+          sample={'Line1\nLine2\t"quoted"'}
+          encode={jsonEscapeEncode}
+          decode={jsonEscapeDecode}
+          outputFilename="json-escape.txt"
+        />
+      ) : (
+        <CodecTool
+          hideHeader
+          title="Escape Sequences"
+          description="Convert between raw text and escape sequences."
+          slug="json-escape"
+          sample={"Hello\nWorld\t!"}
+          encode={escapeSequencesEncode}
+          decode={escapeSequencesDecode}
+          outputFilename="escapes.txt"
+        />
+      )}
+    </>
   );
 }

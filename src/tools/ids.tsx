@@ -65,7 +65,7 @@ function parseUuidParts(raw: string) {
   return { value, version, variant, timestampMs };
 }
 
-type UuidTab = "generate" | "validate";
+type UuidTab = "generate" | "validate" | "nanoid";
 
 export function uuid() {
   const meta = getToolBySlug("uuid");
@@ -74,6 +74,9 @@ export function uuid() {
   const [count, setCount] = useState(1);
   const [generated, setGenerated] = useState("");
   const [validateInput, setValidateInput] = useState("");
+  const [nanoIds, setNanoIds] = useState<string[]>([]);
+  const [nanoCount, setNanoCount] = useState(5);
+  const [nanoSize, setNanoSize] = useState(21);
 
   const generate = useCallback(() => {
     const n = Math.min(100, Math.max(1, count));
@@ -83,8 +86,15 @@ export function uuid() {
     setGenerated(lines.join("\n"));
   }, [count, version]);
 
+  const generateNano = useCallback(() => {
+    setNanoIds(
+      Array.from({ length: Math.min(50, Math.max(1, nanoCount)) }, () => createNanoid(nanoSize)),
+    );
+  }, [nanoCount, nanoSize]);
+
   useEffect(() => {
     generate();
+    generateNano();
   }, []); // initial sample
 
   const validations = useMemo(() => {
@@ -108,20 +118,25 @@ export function uuid() {
   return (
     <>
       <ToolHeader
-        name={meta?.name ?? "UUID"}
+        name={meta?.name ?? "UUID / Nano ID"}
         description={meta?.description ?? ""}
         slug="uuid"
       />
       <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-        {(["generate", "validate"] as const).map((t) => (
+        {(
+          [
+            ["generate", "UUID generate"],
+            ["validate", "UUID validate"],
+            ["nanoid", "Nano ID"],
+          ] as const
+        ).map(([key, label]) => (
           <Button
-            key={t}
+            key={key}
             type="button"
-            variant={tab === t ? "primary" : "outline"}
-            onClick={() => setTab(t)}
-            className="capitalize"
+            variant={tab === key ? "primary" : "outline"}
+            onClick={() => setTab(key)}
           >
-            {t}
+            {label}
           </Button>
         ))}
       </div>
@@ -170,7 +185,7 @@ export function uuid() {
             />
           </Panel>
         </div>
-      ) : (
+      ) : tab === "validate" ? (
         <div className="flex min-h-[24rem] flex-col gap-3">
           <div className="flex flex-wrap gap-2">
             <SampleButton
@@ -208,6 +223,50 @@ export function uuid() {
                 ))}
               </ul>
             )}
+          </Panel>
+        </div>
+      ) : (
+        <div className="flex min-h-[20rem] flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+            <label className="flex items-center gap-2 text-sm text-zinc-400">
+              Count
+              <Input
+                type="number"
+                min={1}
+                max={50}
+                value={nanoCount}
+                onChange={(e) => setNanoCount(Number(e.target.value) || 1)}
+                className="w-20"
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-zinc-400">
+              Size
+              <Input
+                type="number"
+                min={8}
+                max={64}
+                value={nanoSize}
+                onChange={(e) => setNanoSize(Number(e.target.value) || 21)}
+                className="w-20"
+              />
+            </label>
+            <Button type="button" onClick={generateNano}>
+              Generate
+            </Button>
+            <SampleButton
+              label="Sample size 12"
+              onClick={() => {
+                setNanoSize(12);
+                setNanoIds(Array.from({ length: 5 }, () => createNanoid(12)));
+              }}
+            />
+          </div>
+          <Panel title="Nano IDs" actions={<CopyButton value={nanoIds.join("\n")} />}>
+            <ul className="space-y-1 font-mono text-sm text-emerald-300">
+              {nanoIds.map((id) => (
+                <li key={id}>{id}</li>
+              ))}
+            </ul>
           </Panel>
         </div>
       )}
@@ -355,70 +414,6 @@ export function ulid() {
           </Panel>
         </div>
       )}
-    </>
-  );
-}
-
-export function nanoid() {
-  const meta = getToolBySlug("nanoid");
-  const [ids, setIds] = useState<string[]>([]);
-  const [count, setCount] = useState(5);
-  const [size, setSize] = useState(21);
-
-  const generate = useCallback(() => {
-    setIds(Array.from({ length: Math.min(50, Math.max(1, count)) }, () => createNanoid(size)));
-  }, [count, size]);
-
-  useEffect(() => {
-    generate();
-  }, []);
-
-  return (
-    <>
-      <ToolHeader name={meta?.name ?? "Nano ID"} description={meta?.description ?? ""} slug="nanoid" />
-      <div className="flex min-h-[20rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
-            Count
-            <Input
-              type="number"
-              min={1}
-              max={50}
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value) || 1)}
-              className="w-20"
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
-            Size
-            <Input
-              type="number"
-              min={8}
-              max={64}
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value) || 21)}
-              className="w-20"
-            />
-          </label>
-          <Button type="button" onClick={generate}>
-            Generate
-          </Button>
-          <SampleButton
-            label="Sample size 12"
-            onClick={() => {
-              setSize(12);
-              setIds(Array.from({ length: 5 }, () => createNanoid(12)));
-            }}
-          />
-        </div>
-        <Panel title="Nano IDs" actions={<CopyButton value={ids.join("\n")} />}>
-          <ul className="space-y-1 font-mono text-sm text-emerald-300">
-            {ids.map((id) => (
-              <li key={id}>{id}</li>
-            ))}
-          </ul>
-        </Panel>
-      </div>
     </>
   );
 }

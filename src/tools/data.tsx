@@ -55,32 +55,6 @@ function walkJsonPath(data: unknown, path: string): unknown {
   return current;
 }
 
-function validateSchema(data: unknown, schema: Record<string, unknown>): string[] {
-  const errors: string[] = [];
-  const type = schema.type as string | undefined;
-  if (type) {
-    const actual = Array.isArray(data) ? "array" : data === null ? "null" : typeof data;
-    if (type === "integer") {
-      if (typeof data !== "number" || !Number.isInteger(data)) errors.push(`Expected integer, got ${actual}`);
-    } else if (actual !== type) {
-      errors.push(`Expected type ${type}, got ${actual}`);
-    }
-  }
-  if (schema.required && typeof data === "object" && data && !Array.isArray(data)) {
-    for (const key of schema.required as string[]) {
-      if (!(key in (data as Record<string, unknown>))) errors.push(`Missing required property: ${key}`);
-    }
-  }
-  if (schema.properties && typeof data === "object" && data && !Array.isArray(data)) {
-    for (const [key, sub] of Object.entries(schema.properties as Record<string, unknown>)) {
-      if (key in (data as Record<string, unknown>)) {
-        errors.push(...validateSchema((data as Record<string, unknown>)[key], sub as Record<string, unknown>));
-      }
-    }
-  }
-  return errors;
-}
-
 function toCamel(s: string) {
   return s.replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : "")).replace(/^./, (c) => c.toLowerCase());
 }
@@ -96,24 +70,6 @@ function toKebab(s: string) {
 }
 function toTitle(s: string) {
   return s.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
-}
-
-function basicCodeFormat(input: string): string {
-  try {
-    return JSON.stringify(JSON.parse(input), null, 2);
-  } catch {
-    let indent = 0;
-    const lines: string[] = [];
-    const parts = input.replace(/\{/g, "{\n").replace(/\}/g, "\n}").replace(/;/g, ";\n").split("\n");
-    for (const raw of parts) {
-      const line = raw.trim();
-      if (!line) continue;
-      if (/^[}\]]/.test(line)) indent = Math.max(0, indent - 1);
-      lines.push("  ".repeat(indent) + line);
-      if (/[\[{]\s*$/.test(line)) indent++;
-    }
-    return lines.join("\n");
-  }
 }
 
 const LOREM =
@@ -261,49 +217,6 @@ export function jsonPath() {
         />
       </div>
       <TextIO input={json} output={output} onInputChange={setJson} onClear={() => setJson("")} inputLabel="JSON" outputFilename="result.json" error={error} />
-    </>
-  );
-}
-
-export function jsonSchema() {
-  const meta = getToolBySlug("json-schema");
-  const [json, setJson] = useState('{"name":"Ada","age":36}');
-  const [schema, setSchema] = useState('{"type":"object","required":["name"],"properties":{"name":{"type":"string"},"age":{"type":"integer"}}}');
-  const [output, setOutput] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      const data = JSON.parse(json);
-      const sch = JSON.parse(schema) as Record<string, unknown>;
-      const errs = validateSchema(data, sch);
-      setOutput(errs.length ? `Invalid:\n${errs.map((e) => `• ${e}`).join("\n")}` : "Valid ✓");
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Validation error");
-      setOutput("");
-    }
-  }, [json, schema]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "JSON Schema"}
-        description={meta?.description ?? ""}
-        slug="json-schema"
-      />
-      <div className="grid min-h-[28rem] gap-3 lg:grid-cols-2">
-        <Panel title="JSON">
-          <Textarea value={json} onChange={(e) => setJson(e.target.value)} className={`min-h-[12rem] ${textareaClass}`} />
-        </Panel>
-        <Panel title="Schema">
-          <Textarea value={schema} onChange={(e) => setSchema(e.target.value)} className={`min-h-[12rem] ${textareaClass}`} />
-        </Panel>
-      </div>
-      {error ? <p className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">{error}</p> : null}
-      <Panel title="Result" className="mt-3">
-        <pre className="whitespace-pre-wrap text-sm text-zinc-200">{output}</pre>
-      </Panel>
     </>
   );
 }
@@ -506,9 +419,22 @@ export function textCase() {
   );
 }
 
-export function textStatistic() {
-  const meta = getToolBySlug("text-statistic");
+const SORT_SAMPLE = "banana\napple\nCherry\n42\n7\napple";
+
+type TextToolkitTab = "stats" | "filter" | "sort" | "format";
+
+export function textToolkit() {
+  const meta = getToolBySlug("text-toolkit");
+  const [tab, setTab] = useState<TextToolkitTab>("stats");
   const [input, setInput] = useState("");
+  const [pattern, setPattern] = useState("");
+  const [filterMode, setFilterMode] = useState<"include" | "exclude">("include");
+  const [ignoreCase, setIgnoreCase] = useState(false);
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [numeric, setNumeric] = useState(false);
+  const [unique, setUnique] = useState(false);
+  const [ops, setOps] = useState({ trim: true, collapse: false, dedupe: false });
+
   const stats = useMemo(() => {
     const bytes = new TextEncoder().encode(input).length;
     const lines = input ? input.split("\n").length : 0;
@@ -516,96 +442,18 @@ export function textStatistic() {
     return { chars: input.length, words, lines, bytes };
   }, [input]);
 
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "Text Statistic"}
-        description={meta?.description ?? ""}
-        slug="text-statistic"
-      />
-      <div className="grid min-h-[24rem] gap-3 lg:grid-cols-2">
-        <Panel title="Input">
-          <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Paste text…" className={textareaClass} />
-        </Panel>
-        <Panel title="Statistics">
-          <dl className="grid grid-cols-2 gap-4 text-sm">
-            {Object.entries(stats).map(([k, v]) => (
-              <div key={k} className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 p-4">
-                <dt className="text-zinc-500 capitalize">{k}</dt>
-                <dd className="mt-1 text-2xl font-semibold text-emerald-300">{v}</dd>
-              </div>
-            ))}
-          </dl>
-        </Panel>
-      </div>
-    </>
-  );
-}
-
-export function textFilter() {
-  const meta = getToolBySlug("text-filter");
-  const [input, setInput] = useState("");
-  const [pattern, setPattern] = useState("");
-  const [mode, setMode] = useState<"include" | "exclude">("include");
-  const [ignoreCase, setIgnoreCase] = useState(false);
-  const output = useMemo(() => {
+  const filterOutput = useMemo(() => {
     if (!input) return "";
     const lines = input.split("\n");
     if (!pattern) return input;
-    const match = (line: string) => {
-      if (ignoreCase) {
-        return line.toLowerCase().includes(pattern.toLowerCase());
-      }
-      return line.includes(pattern);
-    };
+    const match = (line: string) =>
+      ignoreCase ? line.toLowerCase().includes(pattern.toLowerCase()) : line.includes(pattern);
     return lines
-      .filter((line) => (mode === "include" ? match(line) : !match(line)))
+      .filter((line) => (filterMode === "include" ? match(line) : !match(line)))
       .join("\n");
-  }, [input, pattern, mode, ignoreCase]);
+  }, [input, pattern, filterMode, ignoreCase]);
 
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "Text Filter"}
-        description={meta?.description ?? ""}
-        slug="text-filter"
-      />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        options={
-          <>
-            <Input value={pattern} onChange={(e) => setPattern(e.target.value)} placeholder="Substring…" className="max-w-xs" />
-            <Button type="button" variant={mode === "include" ? "primary" : "outline"} onClick={() => setMode("include")}>Include</Button>
-            <Button type="button" variant={mode === "exclude" ? "primary" : "outline"} onClick={() => setMode("exclude")}>Exclude</Button>
-            <label className="flex items-center gap-2 text-sm text-zinc-300">
-              <input type="checkbox" checked={ignoreCase} onChange={(e) => setIgnoreCase(e.target.checked)} className="accent-emerald-500" /> Case-insensitive
-            </label>
-            <SampleButton
-              onClick={() => {
-                setInput("Alpha\nbeta\nGamma\nDELTA\n");
-                setPattern("a");
-                setIgnoreCase(true);
-              }}
-            />
-          </>
-        }
-      />
-    </>
-  );
-}
-
-const SORT_SAMPLE = "banana\napple\nCherry\n42\n7\napple";
-
-export function textSorting() {
-  const meta = getToolBySlug("text-sorting");
-  const [input, setInput] = useState("");
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [numeric, setNumeric] = useState(false);
-  const [unique, setUnique] = useState(false);
-  const output = useMemo(() => {
+  const sortOutput = useMemo(() => {
     let lines = input.split("\n").filter((l, i, arr) => l || i < arr.length - 1);
     if (unique) lines = [...new Set(lines)];
     lines.sort((a, b) => {
@@ -615,43 +463,7 @@ export function textSorting() {
     return lines.join("\n");
   }, [input, order, numeric, unique]);
 
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "Text Sorting"}
-        description={meta?.description ?? "Sort lines alphabetically or numerically (one line per entry)."}
-        slug="text-sorting"
-      />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        inputLabel="Lines"
-        outputLabel="Sorted lines"
-        options={
-          <>
-            <Button type="button" variant={order === "asc" ? "primary" : "outline"} onClick={() => setOrder("asc")}>Asc</Button>
-            <Button type="button" variant={order === "desc" ? "primary" : "outline"} onClick={() => setOrder("desc")}>Desc</Button>
-            <label className="flex items-center gap-2 text-sm text-zinc-300">
-              <input type="checkbox" checked={numeric} onChange={(e) => setNumeric(e.target.checked)} className="accent-emerald-500" /> Numeric
-            </label>
-            <label className="flex items-center gap-2 text-sm text-zinc-300">
-              <input type="checkbox" checked={unique} onChange={(e) => setUnique(e.target.checked)} className="accent-emerald-500" /> Unique
-            </label>
-            <SampleButton label="Sample lines" onClick={() => setInput(SORT_SAMPLE)} />
-          </>
-        }
-      />
-    </>
-  );
-}
-
-export function textFormat() {
-  const meta = getToolBySlug("text-format");
-  const [input, setInput] = useState("");
-  const [ops, setOps] = useState({ trim: true, collapse: false, dedupe: false });
-  const output = useMemo(() => {
+  const formatOutput = useMemo(() => {
     let lines = input.split("\n");
     if (ops.trim) lines = lines.map((l) => l.trim());
     if (ops.collapse) lines = lines.map((l) => l.replace(/\s+/g, " "));
@@ -662,26 +474,170 @@ export function textFormat() {
   return (
     <>
       <ToolHeader
-        name={meta?.name ?? "Text Format"}
+        name={meta?.name ?? "Text Toolkit"}
         description={meta?.description ?? ""}
-        slug="text-format"
+        slug="text-toolkit"
       />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        options={
-          <>
-            {(["trim", "collapse", "dedupe"] as const).map((k) => (
-              <label key={k} className="flex items-center gap-2 text-sm text-zinc-300 capitalize">
-                <input type="checkbox" checked={ops[k]} onChange={(e) => setOps({ ...ops, [k]: e.target.checked })} className="accent-emerald-500" /> {k === "collapse" ? "Collapse spaces" : k}
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        {(
+          [
+            ["stats", "Stats"],
+            ["filter", "Filter"],
+            ["sort", "Sort"],
+            ["format", "Format"],
+          ] as const
+        ).map(([key, label]) => (
+          <Button
+            key={key}
+            type="button"
+            variant={tab === key ? "primary" : "outline"}
+            onClick={() => setTab(key)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+
+      {tab === "stats" ? (
+        <div className="grid min-h-[24rem] gap-3 lg:grid-cols-2">
+          <Panel title="Input" actions={<ClearButton onClick={() => setInput("")} />}>
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Paste text…"
+              className={textareaClass}
+            />
+          </Panel>
+          <Panel title="Statistics">
+            <dl className="grid grid-cols-2 gap-4 text-sm">
+              {Object.entries(stats).map(([k, v]) => (
+                <div key={k} className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 p-4">
+                  <dt className="capitalize text-zinc-500">{k}</dt>
+                  <dd className="mt-1 text-2xl font-semibold text-emerald-300">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </Panel>
+        </div>
+      ) : tab === "filter" ? (
+        <TextIO
+          input={input}
+          output={filterOutput}
+          onInputChange={setInput}
+          onClear={() => setInput("")}
+          options={
+            <>
+              <Input
+                value={pattern}
+                onChange={(e) => setPattern(e.target.value)}
+                placeholder="Substring…"
+                className="max-w-xs"
+              />
+              <Button
+                type="button"
+                variant={filterMode === "include" ? "primary" : "outline"}
+                onClick={() => setFilterMode("include")}
+              >
+                Include
+              </Button>
+              <Button
+                type="button"
+                variant={filterMode === "exclude" ? "primary" : "outline"}
+                onClick={() => setFilterMode("exclude")}
+              >
+                Exclude
+              </Button>
+              <label className="flex items-center gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={ignoreCase}
+                  onChange={(e) => setIgnoreCase(e.target.checked)}
+                  className="accent-emerald-500"
+                />{" "}
+                Case-insensitive
               </label>
-            ))}
-            <SampleButton onClick={() => setInput("  hello   world  \n  hello   world  \nfoo")} />
-          </>
-        }
-      />
+              <SampleButton
+                onClick={() => {
+                  setInput("Alpha\nbeta\nGamma\nDELTA\n");
+                  setPattern("a");
+                  setIgnoreCase(true);
+                }}
+              />
+            </>
+          }
+        />
+      ) : tab === "sort" ? (
+        <TextIO
+          input={input}
+          output={sortOutput}
+          onInputChange={setInput}
+          onClear={() => setInput("")}
+          inputLabel="Lines"
+          outputLabel="Sorted lines"
+          options={
+            <>
+              <Button
+                type="button"
+                variant={order === "asc" ? "primary" : "outline"}
+                onClick={() => setOrder("asc")}
+              >
+                Asc
+              </Button>
+              <Button
+                type="button"
+                variant={order === "desc" ? "primary" : "outline"}
+                onClick={() => setOrder("desc")}
+              >
+                Desc
+              </Button>
+              <label className="flex items-center gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={numeric}
+                  onChange={(e) => setNumeric(e.target.checked)}
+                  className="accent-emerald-500"
+                />{" "}
+                Numeric
+              </label>
+              <label className="flex items-center gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={unique}
+                  onChange={(e) => setUnique(e.target.checked)}
+                  className="accent-emerald-500"
+                />{" "}
+                Unique
+              </label>
+              <SampleButton label="Sample lines" onClick={() => setInput(SORT_SAMPLE)} />
+            </>
+          }
+        />
+      ) : (
+        <TextIO
+          input={input}
+          output={formatOutput}
+          onInputChange={setInput}
+          onClear={() => setInput("")}
+          options={
+            <>
+              {(["trim", "collapse", "dedupe"] as const).map((k) => (
+                <label key={k} className="flex items-center gap-2 text-sm capitalize text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={ops[k]}
+                    onChange={(e) => setOps({ ...ops, [k]: e.target.checked })}
+                    className="accent-emerald-500"
+                  />{" "}
+                  {k === "collapse" ? "Collapse spaces" : k}
+                </label>
+              ))}
+              <SampleButton
+                onClick={() => setInput("  hello   world  \n  hello   world  \nfoo")}
+              />
+            </>
+          }
+        />
+      )}
     </>
   );
 }
@@ -816,45 +772,3 @@ export function loremIpsum() {
   );
 }
 
-export function codeFormat() {
-  const meta = getToolBySlug("code-format");
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!input.trim()) {
-      setOutput("");
-      setError(null);
-      return;
-    }
-    try {
-      setOutput(basicCodeFormat(input));
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Format failed");
-      setOutput("");
-    }
-  }, [input]);
-
-  return (
-    <>
-      <ToolHeader
-        name={meta?.name ?? "Code Style Formatting"}
-        description={meta?.description ?? ""}
-        slug="code-format"
-      />
-      <TextIO
-        input={input}
-        output={output}
-        onInputChange={setInput}
-        onClear={() => setInput("")}
-        outputFilename="formatted.txt"
-        error={error}
-        options={
-          <SampleButton onClick={() => setInput('{"a":1,"b":[2,3]}')} />
-        }
-      />
-    </>
-  );
-}
