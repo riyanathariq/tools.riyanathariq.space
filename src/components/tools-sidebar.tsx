@@ -5,8 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Cloud, Search, X } from "lucide-react";
 
 import { searchTools } from "@/data/tools-registry";
-import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
+import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
 import { Input } from "@/components/ui/input";
 
 const categoryOrder: ToolCategory[] = [
@@ -131,15 +132,25 @@ export function ToolsSidebar({
         ) : null}
       </nav>
 
-      <div className="border-t border-zinc-800/80 p-3 text-xs text-zinc-500">
+      <div className="space-y-1.5 border-t border-zinc-800/80 p-3 text-xs text-zinc-500">
         <a
           href="https://riyanathariq.space"
-          className="hover:text-emerald-400"
+          className="block hover:text-emerald-400"
           target="_blank"
           rel="noopener noreferrer"
         >
           riyanathariq.space
         </a>
+        {siteConfig.saweriaUrl ? (
+          <a
+            href={siteConfig.saweriaUrl}
+            className="block hover:text-emerald-400"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Support via Saweria
+          </a>
+        ) : null}
       </div>
     </aside>
   );
