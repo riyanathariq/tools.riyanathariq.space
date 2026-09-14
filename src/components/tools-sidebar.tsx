@@ -67,10 +67,14 @@ export function ToolsSidebar({
         "lg:w-72",
       )}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 px-4 py-4">
+      <div className="flex items-center justify-between gap-2 border-b border-emerald-500/10 px-4 py-4">
         <Link href="/" className="group min-w-0" onClick={onClose}>
-          <p className="truncate text-sm font-semibold tracking-tight text-zinc-50">
+          <p className="truncate font-mono text-[11px] tracking-[0.14em] text-emerald-400/90 uppercase">
+            terminal lab
+          </p>
+          <p className="mt-0.5 truncate text-sm font-semibold tracking-tight text-zinc-50">
             tools<span className="text-emerald-400">.riyanathariq</span>
+            <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 animate-pulse bg-emerald-400 align-middle" />
           </p>
         </Link>
         <button

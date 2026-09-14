@@ -1,6 +1,8 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft, Menu } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
@@ -9,13 +11,14 @@ import { ToolsSidebar } from "@/components/tools-sidebar";
 import { VisitorBeacon } from "@/components/visitor-beacon";
 import { getToolBySlug } from "@/data/tools-registry";
 import { cn } from "@/lib/utils";
+import { CATEGORY_LABELS } from "@/types/tool";
 
 export function ToolsShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const activeSlug = pathname?.startsWith("/t/") ? pathname.slice(3).split("/")[0] : undefined;
   const tool = activeSlug ? getToolBySlug(activeSlug) : undefined;
-  const title = tool?.name ?? "Developer Tools";
+  const onTool = Boolean(tool);
 
   return (
     <div className="relative flex min-h-dvh bg-zinc-950 text-zinc-100">
@@ -64,23 +67,75 @@ export function ToolsShell({ children }: { children: ReactNode }) {
       </div>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-800/80 bg-zinc-950/90 px-4 backdrop-blur-xl">
-          <button
-            type="button"
-            className="inline-flex size-11 items-center justify-center rounded-xl border border-zinc-800 text-zinc-200 lg:hidden"
-            onClick={() => setOpen(true)}
-            aria-label="Open tools menu"
-          >
-            <Menu className="size-5" />
-          </button>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-zinc-100 lg:hidden">{title}</p>
-            <p className="hidden text-sm text-zinc-500 lg:block">
-              Local tools run in-browser · Premium tools need sign-in
-            </p>
+        <header className="sticky top-0 z-30 border-b border-emerald-500/10 bg-zinc-950/90 backdrop-blur-xl">
+          <div className="flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-4">
+            <button
+              type="button"
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 text-zinc-200 hover:border-emerald-500/30 hover:text-emerald-200 lg:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open tools menu"
+            >
+              <Menu className="size-5" />
+            </button>
+
+            {onTool && tool ? (
+              <>
+                <Link
+                  href="/"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 font-mono text-[11px] text-emerald-300 transition hover:border-emerald-400/50 hover:bg-emerald-500/15 sm:px-3 sm:text-xs"
+                >
+                  <ArrowLeft className="size-3.5" />
+                  <span className="hidden sm:inline">All tools</span>
+                  <span className="sm:hidden">Catalog</span>
+                </Link>
+
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={tool.slug}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.18 }}
+                    className="min-w-0 flex-1"
+                  >
+                    <p className="truncate font-mono text-[11px] text-zinc-500 sm:text-xs">
+                      <span className="text-zinc-400">{CATEGORY_LABELS[tool.category]}</span>
+                      <span className="mx-1.5 text-zinc-600">›</span>
+                      <span className="text-zinc-100">{tool.name}</span>
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                <span
+                  className={cn(
+                    "hidden shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] tracking-wide uppercase sm:inline-flex",
+                    tool.cloud
+                      ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+                  )}
+                >
+                  {tool.cloud ? "premium" : "local"}
+                </span>
+              </>
+            ) : (
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-mono text-sm text-zinc-100">
+                  Developer Tools
+                  <span className="ml-2 text-zinc-500">· catalog</span>
+                </p>
+                <p className="hidden font-mono text-[11px] text-zinc-600 sm:block">
+                  press <kbd className="rounded border border-zinc-700 px-1 text-zinc-400">/</kbd> to
+                  search sidebar
+                </p>
+              </div>
+            )}
+
+            <div className="ml-auto shrink-0">
+              <AuthButton />
+            </div>
           </div>
-          <AuthButton />
         </header>
+
         <main className="flex-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8">
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
