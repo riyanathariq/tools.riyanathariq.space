@@ -80,6 +80,15 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     case "svg-converter":
       return pickComponent(await import("@/tools/extra-media"), slug);
 
+    // Documents
+    case "pdf-merge":
+    case "pdf-split":
+    case "pdf-organize":
+    case "images-to-pdf":
+    case "pdf-to-images":
+    case "pdf-compress":
+      return pickComponent(await import("@/tools/documents"), slug);
+
     // Misc
     case "units-converter":
     case "ascii-art":

@@ -17,6 +17,7 @@ const categoryOrder: ToolCategory[] = [
   "data",
   "http",
   "media",
+  "documents",
   "misc",
 ];
 

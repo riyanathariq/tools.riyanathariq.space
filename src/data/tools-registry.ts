@@ -320,6 +320,57 @@ export const toolsRegistry: ToolMeta[] = [
     keywords: ["svg", "png", "vector"],
     info: "Paste or upload SVG, preview, download SVG, or rasterize to PNG via canvas. Complex filters/fonts may differ from desktop renderers.",
   },
+
+  // Documents (client-side PDF)
+  {
+    slug: "pdf-merge",
+    name: "PDF Merge",
+    description: "Combine multiple PDFs into one file in your browser.",
+    category: "documents",
+    keywords: ["pdf", "merge", "combine", "join", "document"],
+    info: "Upload two or more PDFs, reorder them, then merge. Processing stays in your browser — files are not uploaded to a server.",
+  },
+  {
+    slug: "pdf-split",
+    name: "PDF Split",
+    description: "Extract page ranges or split every page into separate PDFs.",
+    category: "documents",
+    keywords: ["pdf", "split", "extract", "pages", "document"],
+    info: "Upload a PDF and extract a page range (e.g. 1-3,5,8-10) or export every page as its own file (ZIP). Local-only processing.",
+  },
+  {
+    slug: "pdf-organize",
+    name: "PDF Organize",
+    description: "Reorder, rotate, or delete PDF pages with a visual page list.",
+    category: "documents",
+    keywords: ["pdf", "rotate", "reorder", "delete", "pages", "organize"],
+    info: "Reorder pages, rotate 90°, or remove pages, then download the result. Thumbnails render locally via PDF.js.",
+  },
+  {
+    slug: "images-to-pdf",
+    name: "Images to PDF",
+    description: "Turn JPG/PNG/WebP images into a single PDF.",
+    category: "documents",
+    keywords: ["pdf", "image", "jpg", "png", "webp", "scan", "document"],
+    info: "Drop images, reorder, pick page size/orientation, export one PDF. All conversion happens in the browser.",
+  },
+  {
+    slug: "pdf-to-images",
+    name: "PDF to Images",
+    description: "Render PDF pages to PNG or JPEG and download as a ZIP.",
+    category: "documents",
+    keywords: ["pdf", "png", "jpeg", "export", "render", "document"],
+    info: "Renders each page to an image at 1×–3× scale. Download a single page or a ZIP of all pages. Large PDFs can be memory-heavy.",
+  },
+  {
+    slug: "pdf-compress",
+    name: "PDF Compress",
+    description: "Light client-side compression by re-encoding page images.",
+    category: "documents",
+    keywords: ["pdf", "compress", "optimize", "shrink", "document"],
+    info: "Re-renders pages and re-embeds as JPEG at a chosen quality. Good for scans/photos; text-heavy vector PDFs may not shrink much. Not Ghostscript-level compression.",
+  },
+
   // Misc
   {
     slug: "units-converter",
