@@ -9,6 +9,7 @@ export type ToolCategory =
   | "http"
   | "media"
   | "documents"
+  | "indonesia"
   | "misc";
 
 export interface ToolMeta {
@@ -34,5 +35,6 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   http: "HTTP & CLI",
   media: "Media",
   documents: "Documents",
+  indonesia: "Indonesia",
   misc: "Units & Misc",
 };

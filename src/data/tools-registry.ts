@@ -371,6 +371,61 @@ export const toolsRegistry: ToolMeta[] = [
     info: "Re-renders pages and re-embeds as JPEG at a chosen quality. Good for scans/photos; text-heavy vector PDFs may not shrink much. Not Ghostscript-level compression.",
   },
 
+  // Indonesia (wilayah admin via GitHub Pages API)
+  {
+    slug: "wilayah-explorer",
+    name: "Wilayah Explorer",
+    description:
+      "Searchable dropdowns for Prov → Kab/Kota → Kec → Desa. Start from Kab — parents auto-lock.",
+    category: "indonesia",
+    keywords: [
+      "wilayah",
+      "indonesia",
+      "provinsi",
+      "kabupaten",
+      "kecamatan",
+      "desa",
+      "kelurahan",
+      "kode wilayah",
+      "alamat",
+      "dropdown",
+    ],
+    info: "Each level is a combobox with search inside the dropdown. Pick Kab/Kota first and Provinsi locks from province_id. Kec/Desa load under the selected parent. Copy kode, path, JSON, or API URL.",
+  },
+  {
+    slug: "wilayah-lookup",
+    name: "Wilayah Lookup",
+    description: "Resolve a kode wilayah (2/4/6/10 digits) into the full hierarchy.",
+    category: "indonesia",
+    keywords: [
+      "wilayah",
+      "kode",
+      "lookup",
+      "indonesia",
+      "postal",
+      "bps",
+      "kemendagri",
+    ],
+    info: "Paste 2 (provinsi), 4 (kab/kota), 6 (kecamatan), or 10 (desa) digit codes. Fetches only the needed static JSON files. Postal code appears when a village is resolved.",
+  },
+  {
+    slug: "wilayah-api",
+    name: "Wilayah API Docs",
+    description: "Integration docs for the public wilayah-indonesia JSON API.",
+    category: "indonesia",
+    keywords: [
+      "wilayah",
+      "api",
+      "docs",
+      "integration",
+      "curl",
+      "fetch",
+      "cors",
+      "indonesia",
+    ],
+    info: "Documents the GitHub Pages endpoints (provinces → subdistrict), path builder, curl/fetch snippets, and sample payloads. Same API consumed by Explorer/Lookup — no private Tools backend.",
+  },
+
   // Misc
   {
     slug: "units-converter",

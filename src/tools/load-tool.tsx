@@ -89,6 +89,12 @@ export async function loadToolComponent(slug: string): Promise<ComponentType> {
     case "pdf-compress":
       return pickComponent(await import("@/tools/documents"), slug);
 
+    // Indonesia
+    case "wilayah-explorer":
+    case "wilayah-lookup":
+    case "wilayah-api":
+      return pickComponent(await import("@/tools/wilayah"), slug);
+
     // Misc
     case "units-converter":
     case "ascii-art":
