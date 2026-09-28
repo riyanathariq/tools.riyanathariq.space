@@ -28,6 +28,7 @@ import {
   getAllRegencies,
   getDistricts,
   getProvinces,
+  getRegencies,
   getSubdistricts,
   normalizeKode,
   provincesUrl,
@@ -66,6 +67,7 @@ function SearchCombobox({
   loading,
   placeholder,
   emptyHint,
+  onOpen,
 }: {
   label: string;
   items: ComboItem[];
@@ -75,6 +77,7 @@ function SearchCombobox({
   loading?: boolean;
   placeholder: string;
   emptyHint?: string;
+  onOpen?: () => void;
 }) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -272,10 +275,14 @@ function SearchCombobox({
       <button
         ref={triggerRef}
         type="button"
-        disabled={loading}
+        disabled={loading && items.length === 0}
         onClick={() => {
           if (locked) return;
-          setOpen((o) => !o);
+          setOpen((o) => {
+            const next = !o;
+            if (next) onOpen?.();
+            return next;
+          });
         }}
         className={cn(
           "flex h-10 w-full items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-left text-sm transition-colors",
@@ -299,9 +306,16 @@ function SearchCombobox({
           <span
             role="button"
             tabIndex={-1}
+            aria-label={`Clear ${label}`}
             className="rounded p-0.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
-            onClick={(e) => {
+            onMouseDown={(e) => {
+              e.preventDefault();
               e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen(false);
               clear();
             }}
           >
@@ -379,7 +393,7 @@ function ResultCard({
 export function wilayahExplorer() {
   const meta = getToolBySlug("wilayah-explorer");
   const [provinces, setProvinces] = useState<WilayahProvince[]>([]);
-  const [allRegencies, setAllRegencies] = useState<WilayahRegency[]>([]);
+  const [regencies, setRegencies] = useState<WilayahRegency[]>([]);
   const [districts, setDistricts] = useState<WilayahDistrict[]>([]);
   const [villages, setVillages] = useState<WilayahSubdistrict[]>([]);
 
@@ -388,49 +402,77 @@ export function wilayahExplorer() {
   const [distId, setDistId] = useState<number | null>(null);
   const [vilId, setVilId] = useState<number | null>(null);
 
-  /** Who locked the parent fields (child selection). */
   const [lockProv, setLockProv] = useState(false);
   const [lockReg, setLockReg] = useState(false);
   const [lockDist, setLockDist] = useState(false);
 
-  const [loadingBoot, setLoadingBoot] = useState(true);
+  const [loadingProv, setLoadingProv] = useState(true);
+  const [loadingReg, setLoadingReg] = useState(false);
   const [loadingDist, setLoadingDist] = useState(false);
   const [loadingVil, setLoadingVil] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [allRegsCache, setAllRegsCache] = useState<WilayahRegency[] | null>(null);
 
+  // Provinces only on boot (light).
   useEffect(() => {
     let cancelled = false;
-    setLoadingBoot(true);
-    Promise.all([getProvinces(), getAllRegencies()])
-      .then(([prov, regs]) => {
+    setLoadingProv(true);
+    getProvinces()
+      .then((prov) => {
         if (cancelled) return;
         setProvinces(prov.slice().sort((a, b) => a.value.localeCompare(b.value, "id")));
-        setAllRegencies(regs);
-        setError(null);
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load wilayah data");
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load provinces");
       })
-      .finally(() => {
-        if (!cancelled) setLoadingBoot(false);
-      });
+      .finally(() => setLoadingProv(false));
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const regenciesForSelect = useMemo(() => {
-    if (provId == null) return allRegencies;
-    return allRegencies.filter((r) => r.province_id === provId);
-  }, [allRegencies, provId]);
+  // Regencies: scoped to province when set; otherwise use full cache for kab-first.
+  useEffect(() => {
+    let cancelled = false;
+
+    if (provId == null) {
+      if (allRegsCache) {
+        setRegencies(allRegsCache);
+        setLoadingReg(false);
+        return;
+      }
+      // Keep empty until user opens Kab (ensureAllRegencies) or picks province.
+      setRegencies([]);
+      setLoadingReg(false);
+      return;
+    }
+
+    setLoadingReg(true);
+    getRegencies(provId)
+      .then((data) => {
+        if (!cancelled) {
+          setRegencies(data.slice().sort((a, b) => a.value.localeCompare(b.value, "id")));
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load kab/kota");
+      })
+      .finally(() => setLoadingReg(false));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [provId, allRegsCache]);
 
   useEffect(() => {
-    setDistricts([]);
-    setVillages([]);
-    if (!lockDist) setDistId(null);
-    if (!lockDist) setVilId(null);
-    if (provId == null || regId == null) return;
     let cancelled = false;
+
+    if (provId == null || regId == null) {
+      setDistricts([]);
+      setLoadingDist(false);
+      return;
+    }
+
     setLoadingDist(true);
     getDistricts(provId, regId)
       .then((data) => {
@@ -439,19 +481,22 @@ export function wilayahExplorer() {
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load kecamatan");
       })
-      .finally(() => {
-        if (!cancelled) setLoadingDist(false);
-      });
+      .finally(() => setLoadingDist(false));
+
     return () => {
       cancelled = true;
     };
-  }, [provId, regId, lockDist]);
+  }, [provId, regId]);
 
   useEffect(() => {
-    setVillages([]);
-    if (!lockDist) setVilId(null);
-    if (provId == null || regId == null || distId == null) return;
     let cancelled = false;
+
+    if (provId == null || regId == null || distId == null) {
+      setVillages([]);
+      setLoadingVil(false);
+      return;
+    }
+
     setLoadingVil(true);
     getSubdistricts(provId, regId, distId)
       .then((data) => {
@@ -460,54 +505,83 @@ export function wilayahExplorer() {
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load desa/kelurahan");
       })
-      .finally(() => {
-        if (!cancelled) setLoadingVil(false);
-      });
+      .finally(() => setLoadingVil(false));
+
     return () => {
       cancelled = true;
     };
-  }, [provId, regId, distId, lockDist]);
+  }, [provId, regId, distId]);
+
+  const ensureAllRegencies = async () => {
+    if (allRegsCache || loadingReg) return;
+    setLoadingReg(true);
+    try {
+      const all = await getAllRegencies();
+      setAllRegsCache(all);
+      if (provId == null) setRegencies(all);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load kab/kota");
+    } finally {
+      setLoadingReg(false);
+    }
+  };
 
   const province = provinces.find((p) => p.id === provId);
-  const regency = allRegencies.find((r) => r.id === regId);
+  const regency =
+    regencies.find((r) => r.id === regId) ??
+    allRegsCache?.find((r) => r.id === regId);
   const district = districts.find((d) => d.id === distId);
   const village = villages.find((v) => v.id === vilId);
 
   const onProvince = (id: number | null) => {
+    setLoadingDist(false);
+    setLoadingVil(false);
     setProvId(id);
     setLockProv(false);
     setRegId(null);
     setDistId(null);
     setVilId(null);
+    setDistricts([]);
+    setVillages([]);
     setLockReg(false);
     setLockDist(false);
   };
 
   const onRegency = (id: number | null) => {
+    setLoadingDist(false);
+    setLoadingVil(false);
     if (id == null) {
       setRegId(null);
       setLockProv(false);
       setDistId(null);
       setVilId(null);
+      setDistricts([]);
+      setVillages([]);
       setLockReg(false);
       setLockDist(false);
       return;
     }
-    const reg = allRegencies.find((r) => r.id === id);
+    const reg =
+      regencies.find((r) => r.id === id) ??
+      allRegsCache?.find((r) => r.id === id);
     if (!reg) return;
     setRegId(id);
     setProvId(reg.province_id);
     setLockProv(true);
     setDistId(null);
     setVilId(null);
+    setDistricts([]);
+    setVillages([]);
     setLockReg(false);
     setLockDist(false);
   };
 
   const onDistrict = (id: number | null) => {
+    setLoadingVil(false);
     if (id == null) {
       setDistId(null);
       setVilId(null);
+      setVillages([]);
       setLockReg(false);
       setLockDist(false);
       return;
@@ -520,6 +594,7 @@ export function wilayahExplorer() {
     setLockProv(true);
     setLockReg(true);
     setVilId(null);
+    setVillages([]);
     setLockDist(false);
   };
 
@@ -566,14 +641,20 @@ export function wilayahExplorer() {
           : "";
 
   const clear = () => {
+    setLoadingDist(false);
+    setLoadingVil(false);
     setProvId(null);
     setRegId(null);
     setDistId(null);
     setVilId(null);
+    setDistricts([]);
+    setVillages([]);
     setLockProv(false);
     setLockReg(false);
     setLockDist(false);
     setError(null);
+    if (allRegsCache) setRegencies(allRegsCache);
+    else setRegencies([]);
   };
 
   return (
@@ -587,7 +668,7 @@ export function wilayahExplorer() {
         <Panel title="Cascade">
           <div className="space-y-3">
             <p className="text-xs text-zinc-500">
-              Search inside each dropdown. You can start from Kab/Kota — Provinsi locks from{" "}
+              Search inside each dropdown. Start from Kab/Kota — Provinsi locks from{" "}
               <code className="text-zinc-400">province_id</code>.
             </p>
             <SearchCombobox
@@ -596,18 +677,19 @@ export function wilayahExplorer() {
               value={provId}
               onChange={onProvince}
               locked={lockProv}
-              loading={loadingBoot}
+              loading={loadingProv}
               placeholder="Select or search province"
             />
             <SearchCombobox
               label="Kabupaten / Kota"
-              items={regenciesForSelect}
+              items={regencies}
               value={regId}
               onChange={onRegency}
               locked={lockReg}
-              loading={loadingBoot}
+              loading={loadingReg}
               placeholder={provId ? "Select kab/kota" : "Search any kab/kota (locks province)"}
-              emptyHint="Loading kab/kota…"
+              emptyHint={provId ? "No kab/kota" : "Open to load all kab/kota…"}
+              onOpen={provId == null ? () => void ensureAllRegencies() : undefined}
             />
             <SearchCombobox
               label="Kecamatan"
