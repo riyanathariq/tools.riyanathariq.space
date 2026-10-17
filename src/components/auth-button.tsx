@@ -10,7 +10,7 @@ export function AuthButton() {
   const { user, logout } = useAuth();
 
   if (user === undefined) {
-    return <span className="text-xs text-zinc-500">…</span>;
+    return <span className="text-xs text-ink-faint">…</span>;
   }
 
   if (!user) {
@@ -34,11 +34,11 @@ export function AuthButton() {
         <img
           src={user.picture}
           alt=""
-          className="size-8 shrink-0 rounded-full border border-zinc-700"
+          className="size-8 shrink-0 rounded-full border border-line-strong"
           referrerPolicy="no-referrer"
         />
       ) : null}
-      <span className="hidden max-w-[9rem] truncate text-xs text-zinc-400 md:inline">
+      <span className="hidden max-w-[9rem] truncate text-xs text-ink-muted md:inline">
         {user.email}
       </span>
       <Button

@@ -88,9 +88,9 @@ function parseCertificate(pem: string): CertInfo {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className="mt-0.5 break-all font-mono text-sm text-zinc-100">{value || "—"}</p>
+    <div className="rounded-xl border border-line bg-raised px-3 py-2">
+      <p className="text-xs text-ink-faint">{label}</p>
+      <p className="mt-0.5 break-all font-mono text-sm text-ink">{value || "—"}</p>
     </div>
   );
 }
@@ -134,12 +134,12 @@ export function certInspector() {
             value={pem}
             onChange={(e) => setPem(e.target.value)}
             placeholder="-----BEGIN CERTIFICATE-----&#10;…&#10;-----END CERTIFICATE-----"
-            className="min-h-[10rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+            className="min-h-[10rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
           />
         </Panel>
 
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -155,16 +155,16 @@ export function certInspector() {
               {info.fingerprintSha256 ? (
                 <InfoRow label="SHA-256 fingerprint" value={info.fingerprintSha256} />
               ) : null}
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2">
-                <p className="text-xs text-zinc-500">Subject Alternative Names (SANs)</p>
+              <div className="rounded-xl border border-line bg-raised px-3 py-2">
+                <p className="text-xs text-ink-faint">Subject Alternative Names (SANs)</p>
                 {info.sans.length ? (
-                  <ul className="mt-1 space-y-1 font-mono text-sm text-zinc-100">
+                  <ul className="mt-1 space-y-1 font-mono text-sm text-ink">
                     {info.sans.map((san) => (
                       <li key={san}>{san}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-0.5 text-sm text-zinc-500">None listed</p>
+                  <p className="mt-0.5 text-sm text-ink-faint">None listed</p>
                 )}
               </div>
             </div>
@@ -238,12 +238,12 @@ export function passwordHash() {
         slug="password-hash"
       />
       <div className="flex min-h-[20rem] flex-col gap-3">
-        <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+        <p className="rounded-xl border border-premium/40 bg-premium-soft px-3 py-2 text-sm text-premium-ink">
           Client-side only — passwords and hashes never leave your browser. Do not use for
           production credential storage without proper security review.
         </p>
 
-        <div className="flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
           {(["generate", "verify"] as const).map((t) => (
             <Button
               key={t}
@@ -255,7 +255,7 @@ export function passwordHash() {
               {t}
             </Button>
           ))}
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             Cost (rounds)
             <Input
               type="number"
@@ -265,12 +265,12 @@ export function passwordHash() {
               onChange={(e) => setCost(Math.min(12, Math.max(4, Number(e.target.value) || 10)))}
               className="w-16"
             />
-            <span className="text-xs text-zinc-500">({costLabel})</span>
+            <span className="text-xs text-ink-faint">({costLabel})</span>
           </label>
         </div>
 
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -296,7 +296,7 @@ export function passwordHash() {
                 value={hash}
                 readOnly
                 placeholder="Hash appears here…"
-                className="min-h-[4rem] border-0 bg-zinc-950 p-0 font-mono text-xs text-emerald-300 focus:ring-0"
+                className="min-h-[4rem] border-0 bg-sunken p-0 font-mono text-xs text-success focus:ring-0"
               />
             </Panel>
           </>
@@ -315,7 +315,7 @@ export function passwordHash() {
                 value={verifyHash}
                 onChange={(e) => setVerifyHash(e.target.value)}
                 placeholder="$2a$10$…"
-                className="min-h-[4rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[4rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
               />
               <Button type="button" className="mt-3" onClick={verify} disabled={loading}>
                 {loading ? "Verifying…" : "Verify"}
@@ -325,8 +325,8 @@ export function passwordHash() {
               <p
                 className={
                   verifyResult
-                    ? "rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300"
-                    : "rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
+                    ? "rounded-xl border border-success/30 bg-success-soft px-3 py-2 text-sm text-success"
+                    : "rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink"
                 }
               >
                 {verifyResult ? "Password matches hash." : "Password does not match hash."}

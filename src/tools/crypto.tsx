@@ -220,10 +220,10 @@ function StatusChip({
   tone: "ok" | "warn" | "bad" | "neutral";
 }) {
   const tones = {
-    ok: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-    warn: "border-amber-500/40 bg-amber-500/10 text-amber-300",
-    bad: "border-rose-500/40 bg-rose-500/10 text-rose-300",
-    neutral: "border-zinc-600 bg-zinc-900 text-zinc-400",
+    ok: "border-success/40 bg-success-soft text-success",
+    warn: "border-premium/40 bg-premium-soft text-premium-ink",
+    bad: "border-danger bg-danger-soft text-danger-ink",
+    neutral: "border-line bg-raised text-ink-muted",
   };
   return (
     <span className={cn("rounded-full border px-2.5 py-0.5 text-xs font-medium", tones[tone])}>
@@ -258,7 +258,7 @@ function TimeClaims({ payload }: { payload: Record<string, unknown> }) {
       {claims.map((c) => (
         <div
           key={c.key}
-          className="flex flex-wrap items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-300"
+          className="flex flex-wrap items-center gap-1.5 rounded-lg border border-line bg-raised px-2.5 py-1.5 text-xs text-ink-muted"
         >
           <span className="font-mono">{c.label}</span>
           {c.badge ? <StatusChip label={c.badge} tone={c.tone ?? "neutral"} /> : null}
@@ -322,7 +322,7 @@ export function hashing() {
                 {a === "MD5" ? "MD5 (legacy)" : a}
               </Button>
             ))}
-            <span className="mx-1 h-5 w-px bg-zinc-700" />
+            <span className="mx-1 h-5 w-px bg-sunken" />
             {(["hex", "base64"] as const).map((f) => (
               <Button
                 key={f}
@@ -374,8 +374,8 @@ export function hmac() {
   return (
     <>
       <ToolHeader name={meta?.name ?? "HMAC"} description={meta?.description ?? ""} slug="hmac" />
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-        <label className="text-sm text-zinc-400">Secret key</label>
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+        <label className="text-sm text-ink-muted">Secret key</label>
         <Input
           value={key}
           onChange={(e) => setKey(e.target.value)}
@@ -392,7 +392,7 @@ export function hmac() {
             {a}
           </Button>
         ))}
-        <span className="mx-1 h-5 w-px bg-zinc-700" />
+        <span className="mx-1 h-5 w-px bg-sunken" />
         {(["hex", "base64"] as const).map((f) => (
           <Button
             key={f}
@@ -561,7 +561,7 @@ export function jwt() {
         description={meta?.description ?? ""}
         slug="jwt"
       />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         {(["decoder", "encoder"] as const).map((t) => (
           <Button
             key={t}
@@ -591,9 +591,9 @@ export function jwt() {
             ) : null}
           </div>
 
-          <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-line bg-raised p-3">
             <div className="min-w-[12rem] flex-1">
-              <label className="mb-1 block text-xs text-zinc-500">HMAC secret (HS256/384/512)</label>
+              <label className="mb-1 block text-xs text-ink-faint">HMAC secret (HS256/384/512)</label>
               <Input
                 value={secret}
                 onChange={(e) => setSecret(e.target.value)}
@@ -602,7 +602,7 @@ export function jwt() {
               />
             </div>
             <div className="min-w-[12rem] flex-1">
-              <label className="mb-1 block text-xs text-zinc-500">Public key PEM (RS256/ES256)</label>
+              <label className="mb-1 block text-xs text-ink-faint">Public key PEM (RS256/ES256)</label>
               <Input
                 value={publicKey}
                 onChange={(e) => setPublicKey(e.target.value)}
@@ -620,12 +620,12 @@ export function jwt() {
           </div>
 
           {decodeError ? (
-            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
               {decodeError}
             </p>
           ) : null}
           {verifyError && verifyStatus === "failed" ? (
-            <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
+            <p className="rounded-xl border border-premium/40 bg-premium-soft px-3 py-2 text-sm text-premium-ink">
               {verifyError}
             </p>
           ) : null}
@@ -635,7 +635,7 @@ export function jwt() {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="Paste encoded JWT…"
-              className="min-h-[6rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[6rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
             />
           </Panel>
 
@@ -645,7 +645,7 @@ export function jwt() {
                 value={headerJson}
                 readOnly
                 placeholder="Header JSON…"
-                className="min-h-[12rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
               />
             </Panel>
             <Panel
@@ -656,7 +656,7 @@ export function jwt() {
                 value={payloadJson}
                 readOnly
                 placeholder="Payload JSON…"
-                className="min-h-[12rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
               />
               {payloadObj ? <TimeClaims payload={payloadObj} /> : null}
             </Panel>
@@ -664,7 +664,7 @@ export function jwt() {
         </div>
       ) : (
         <div className="flex min-h-[28rem] flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
             {(["HS256", "HS384", "HS512"] as const).map((a) => (
               <Button
                 key={a}
@@ -675,7 +675,7 @@ export function jwt() {
                 {a}
               </Button>
             ))}
-            <label className="flex flex-1 items-center gap-2 text-sm text-zinc-400">
+            <label className="flex flex-1 items-center gap-2 text-sm text-ink-muted">
               Secret
               <Input
                 value={encSecret}
@@ -691,7 +691,7 @@ export function jwt() {
           </div>
 
           {encodeError ? (
-            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
               {encodeError}
             </p>
           ) : null}
@@ -701,7 +701,7 @@ export function jwt() {
               value={encPayload}
               onChange={(e) => setEncPayload(e.target.value)}
               placeholder='{ "sub": "1234567890" }'
-              className="min-h-[12rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
             />
           </Panel>
 
@@ -713,7 +713,7 @@ export function jwt() {
               value={encodedToken}
               readOnly
               placeholder="Signed token appears here…"
-              className="min-h-[6rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[6rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
             />
           </Panel>
         </div>
@@ -794,12 +794,12 @@ export function keyGenerator() {
         slug="key-generator"
       />
       <div className="flex min-h-[28rem] flex-col gap-3">
-        <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+        <p className="rounded-xl border border-premium/40 bg-premium-soft px-3 py-2 text-sm text-premium-ink">
           Keys are generated locally in your browser and never leave this device. Do not use
           browser-generated keys for production secrets without proper review.
         </p>
 
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           {(["rsa", "ecdsa", "ed25519"] as const).map((t) => (
             <Button
               key={t}
@@ -822,7 +822,7 @@ export function keyGenerator() {
                   {s}-bit
                 </Button>
               ))}
-              <span className="text-xs text-zinc-500">RSA-OAEP · SHA-256</span>
+              <span className="text-xs text-ink-faint">RSA-OAEP · SHA-256</span>
             </>
           ) : null}
           <Button type="button" onClick={generate} disabled={loading}>
@@ -831,7 +831,7 @@ export function keyGenerator() {
         </div>
 
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -852,7 +852,7 @@ export function keyGenerator() {
               value={publicPem}
               readOnly
               placeholder="Public PEM appears here…"
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
             />
           </Panel>
           <Panel
@@ -870,7 +870,7 @@ export function keyGenerator() {
               value={privatePem}
               readOnly
               placeholder="Private PEM appears here…"
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
             />
           </Panel>
         </div>
@@ -919,10 +919,10 @@ function passwordStrength(
 }
 
 const STRENGTH_COLORS: Record<StrengthLevel, string> = {
-  weak: "bg-rose-500",
-  fair: "bg-amber-500",
-  good: "bg-emerald-400",
-  strong: "bg-emerald-500",
+  weak: "bg-danger",
+  fair: "bg-premium",
+  good: "bg-accent",
+  strong: "bg-accent",
 };
 
 export function passwordGenerator() {
@@ -974,8 +974,8 @@ export function passwordGenerator() {
         slug="password-generator"
       />
       <div className="flex min-h-[20rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-raised p-3">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             Length
             <Input
               type="number"
@@ -996,22 +996,22 @@ export function passwordGenerator() {
               ["Symbols", useSymbols, setUseSymbols],
             ] as const
           ).map(([label, val, set]) => (
-            <label key={label} className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+            <label key={label} className="flex cursor-pointer items-center gap-2 text-sm text-ink-muted">
               <input
                 type="checkbox"
                 checked={val}
                 onChange={(e) => set(e.target.checked)}
-                className="accent-emerald-500"
+                className="accent-accent"
               />
               {label}
             </label>
           ))}
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-muted">
             <input
               type="checkbox"
               checked={excludeAmbiguous}
               onChange={(e) => setExcludeAmbiguous(e.target.checked)}
-              className="accent-emerald-500"
+              className="accent-accent"
             />
             Exclude ambiguous (0O1lI)
           </label>
@@ -1021,14 +1021,14 @@ export function passwordGenerator() {
         </div>
 
         <Panel title="Password" actions={<CopyButton value={password} />}>
-          <p className="break-all font-mono text-lg text-emerald-300">{password || "—"}</p>
+          <p className="break-all font-mono text-lg text-success">{password || "—"}</p>
           {password ? (
             <div className="mt-3 space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-zinc-500">
+              <div className="flex items-center justify-between text-xs text-ink-faint">
                 <span>Strength</span>
-                <span className="capitalize text-zinc-400">{strength.level}</span>
+                <span className="capitalize text-ink-muted">{strength.level}</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+              <div className="h-2 overflow-hidden rounded-full bg-sunken">
                 <div
                   className={cn("h-full rounded-full transition-all", STRENGTH_COLORS[strength.level])}
                   style={{ width: `${(strength.score / strength.max) * 100}%` }}

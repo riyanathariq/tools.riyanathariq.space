@@ -36,7 +36,7 @@ function ToolLoader({ slug }: { slug: string }) {
 
   if (error) {
     return (
-      <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+      <p className="rounded-xl border border-danger bg-danger-soft px-4 py-3 text-sm text-danger-ink">
         {error}
       </p>
     );
@@ -45,7 +45,7 @@ function ToolLoader({ slug }: { slug: string }) {
   if (!loaded) {
     return (
       <div className="flex min-h-[20rem] items-center justify-center">
-        <p className="animate-pulse text-sm text-zinc-500">Loading tool…</p>
+        <p className="animate-pulse text-sm text-ink-faint">Loading tool…</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function ToolPageClient() {
   if (!slug) {
     return (
       <div className="flex min-h-[20rem] items-center justify-center">
-        <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
+        <p className="animate-pulse text-sm text-ink-faint">Loading…</p>
       </div>
     );
   }
@@ -76,7 +76,7 @@ export function ToolPageClient() {
     <Suspense
       fallback={
         <div className="flex min-h-[20rem] items-center justify-center">
-          <p className="animate-pulse text-sm text-zinc-500">Loading…</p>
+          <p className="animate-pulse text-sm text-ink-faint">Loading…</p>
         </div>
       }
     >

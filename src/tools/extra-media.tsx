@@ -69,13 +69,13 @@ function FileDropzone({
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-6 text-center transition-colors",
         dragOver
-          ? "border-emerald-500/60 bg-emerald-500/5"
-          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+          ? "border-success/60 bg-success-soft"
+          : "border-line bg-sunken hover:border-line hover:bg-raised",
       )}
     >
-      <Upload className="size-7 text-zinc-500" />
-      <p className="text-sm text-zinc-300">{label}</p>
-      <p className="text-xs text-zinc-500">Drop a file or click to browse</p>
+      <Upload className="size-7 text-ink-faint" />
+      <p className="text-sm text-ink-muted">{label}</p>
+      <p className="text-xs text-ink-faint">Drop a file or click to browse</p>
       <input
         ref={inputRef}
         type="file"
@@ -187,7 +187,7 @@ export function svgConverter() {
             value={svg}
             onChange={(e) => setSvg(e.target.value)}
             placeholder="Paste SVG markup…"
-            className="min-h-[8rem] border-0 bg-zinc-950 p-0 font-mono text-xs focus:ring-0"
+            className="min-h-[8rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
           />
           {!svg ? (
             <Button type="button" variant="outline" className="mt-2" onClick={() => setSvg(SAMPLE_SVG)}>
@@ -196,10 +196,10 @@ export function svgConverter() {
           ) : null}
         </Panel>
 
-        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+        {error ? <p className="text-sm text-danger-ink">{error}</p> : null}
 
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-          <label className="text-sm text-zinc-400">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+          <label className="text-sm text-ink-muted">
             PNG size (px)
             <Input
               type="number"
@@ -226,10 +226,10 @@ export function svgConverter() {
             <img
               src={previewUrl}
               alt="SVG preview"
-              className="max-h-64 max-w-full rounded-xl border border-zinc-800 bg-white/5 p-4"
+              className="max-h-64 max-w-full rounded-xl border border-line bg-sunken p-4"
             />
           ) : (
-            <p className="text-sm text-zinc-500">SVG preview appears here</p>
+            <p className="text-sm text-ink-faint">SVG preview appears here</p>
           )}
         </Panel>
       </div>

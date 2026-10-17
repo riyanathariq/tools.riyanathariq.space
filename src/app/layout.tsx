@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree, Fira_Code } from "next/font/google";
 
 import { ToastProvider } from "@/components/toast";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const firaCode = Fira_Code({
+  variable: "--font-fira-code",
   subsets: ["latin"],
 });
 
@@ -63,6 +63,9 @@ export const metadata: Metadata = {
   },
 };
 
+/** Applies the saved theme before first paint so there is no light/dark flash. */
+const themeScript = `try{var t=localStorage.getItem("tl-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -71,8 +74,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${figtree.variable} ${firaCode.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full font-sans">
         <ToastProvider>{children}</ToastProvider>
       </body>

@@ -135,12 +135,12 @@ function BitCheckbox({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
+    <label className="flex items-center gap-2 rounded-lg border border-line bg-sunken px-3 py-2 text-sm text-ink-muted">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="accent-emerald-500"
+        className="accent-accent"
       />
       {label}
     </label>
@@ -171,7 +171,7 @@ export function cidrCalculator() {
         slug="cidr-calculator"
       />
       <div className="flex min-h-[24rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -182,7 +182,7 @@ export function cidrCalculator() {
           <ClearButton onClick={() => setInput("")} />
         </div>
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -206,9 +206,9 @@ export function cidrCalculator() {
                   ],
                 ] as const
               ).map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3">
-                  <dt className="text-xs uppercase tracking-wide text-zinc-500">{label}</dt>
-                  <dd className="mt-1 break-all font-mono text-sm text-zinc-200">{value}</dd>
+                <div key={label} className="rounded-xl border border-line bg-sunken p-3">
+                  <dt className="text-xs uppercase tracking-wide text-ink-faint">{label}</dt>
+                  <dd className="mt-1 break-all font-mono text-sm text-ink">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -263,7 +263,7 @@ export function chmodCalculator() {
         <Panel title="Symbolic (ugo rwx)">
           {(["owner", "group", "other"] as const).map((who) => (
             <div key={who} className="mb-4 last:mb-0">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-faint">
                 {who}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -297,22 +297,22 @@ export function chmodCalculator() {
             />
           </div>
           {octalError ? (
-            <p className="mt-2 text-sm text-rose-300">{octalError}</p>
+            <p className="mt-2 text-sm text-danger-ink">{octalError}</p>
           ) : null}
         </Panel>
         <Panel title="Result" actions={<CopyButton value={`${octal} (${symbolic})`} />}>
           <dl className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-              <dt className="text-xs uppercase tracking-wide text-zinc-500">Octal</dt>
-              <dd className="mt-2 font-mono text-3xl font-semibold text-emerald-300">{octal}</dd>
+            <div className="rounded-xl border border-line bg-sunken p-4">
+              <dt className="text-xs uppercase tracking-wide text-ink-faint">Octal</dt>
+              <dd className="mt-2 font-mono text-3xl font-semibold text-success">{octal}</dd>
             </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-              <dt className="text-xs uppercase tracking-wide text-zinc-500">Symbolic</dt>
-              <dd className="mt-2 font-mono text-3xl font-semibold text-emerald-300">{symbolic}</dd>
+            <div className="rounded-xl border border-line bg-sunken p-4">
+              <dt className="text-xs uppercase tracking-wide text-ink-faint">Symbolic</dt>
+              <dd className="mt-2 font-mono text-3xl font-semibold text-success">{symbolic}</dd>
             </div>
           </dl>
-          <p className="mt-4 text-sm text-zinc-500">
-            Example: <code className="text-zinc-300">chmod {octal} file.txt</code>
+          <p className="mt-4 text-sm text-ink-faint">
+            Example: <code className="text-ink-muted">chmod {octal} file.txt</code>
           </p>
         </Panel>
       </div>

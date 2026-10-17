@@ -122,7 +122,7 @@ export function uuid() {
         description={meta?.description ?? ""}
         slug="uuid"
       />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         {(
           [
             ["generate", "UUID generate"],
@@ -143,7 +143,7 @@ export function uuid() {
 
       {tab === "generate" ? (
         <div className="flex min-h-[24rem] flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
             {(["v4", "v7"] as const).map((v) => (
               <Button
                 key={v}
@@ -154,7 +154,7 @@ export function uuid() {
                 UUID {v}
               </Button>
             ))}
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               Count
               <Input
                 type="number"
@@ -181,7 +181,7 @@ export function uuid() {
             <Textarea
               value={generated}
               readOnly
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-emerald-300 focus:ring-0"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-success focus:ring-0"
             />
           </Panel>
         </div>
@@ -202,21 +202,21 @@ export function uuid() {
               value={validateInput}
               onChange={(e) => setValidateInput(e.target.value)}
               placeholder="Paste UUIDs to validate…"
-              className="min-h-[10rem] border-0 bg-zinc-950 p-0 focus:ring-0"
+              className="min-h-[10rem] border-0 bg-sunken p-0 focus:ring-0"
             />
           </Panel>
           <Panel title="Results">
             {validations.length === 0 ? (
-              <p className="text-sm text-zinc-500">Validation results appear here…</p>
+              <p className="text-sm text-ink-faint">Validation results appear here…</p>
             ) : (
               <ul className="space-y-2">
                 {validations.map((row) => (
                   <li
                     key={row.line + row.detail}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 font-mono text-sm"
+                    className="rounded-xl border border-line bg-raised px-3 py-2 font-mono text-sm"
                   >
-                    <p className={row.ok ? "text-emerald-300" : "text-rose-300"}>{row.line}</p>
-                    <p className={`mt-1 text-xs ${row.ok ? "text-zinc-400" : "text-rose-400"}`}>
+                    <p className={row.ok ? "text-success" : "text-danger-ink"}>{row.line}</p>
+                    <p className={`mt-1 text-xs ${row.ok ? "text-ink-muted" : "text-danger-ink"}`}>
                       {row.ok ? `Valid · ${row.detail}` : row.detail}
                     </p>
                   </li>
@@ -227,8 +227,8 @@ export function uuid() {
         </div>
       ) : (
         <div className="flex min-h-[20rem] flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               Count
               <Input
                 type="number"
@@ -239,7 +239,7 @@ export function uuid() {
                 className="w-20"
               />
             </label>
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               Size
               <Input
                 type="number"
@@ -262,7 +262,7 @@ export function uuid() {
             />
           </div>
           <Panel title="Nano IDs" actions={<CopyButton value={nanoIds.join("\n")} />}>
-            <ul className="space-y-1 font-mono text-sm text-emerald-300">
+            <ul className="space-y-1 font-mono text-sm text-success">
               {nanoIds.map((id) => (
                 <li key={id}>{id}</li>
               ))}
@@ -322,7 +322,7 @@ export function ulid() {
   return (
     <>
       <ToolHeader name={meta?.name ?? "ULID"} description={meta?.description ?? ""} slug="ulid" />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         {(["generate", "validate"] as const).map((t) => (
           <Button
             key={t}
@@ -338,8 +338,8 @@ export function ulid() {
 
       {tab === "generate" ? (
         <div className="flex min-h-[20rem] flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               Count
               <Input
                 type="number"
@@ -350,12 +350,12 @@ export function ulid() {
                 className="w-20"
               />
             </label>
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               <input
                 type="checkbox"
                 checked={upper}
                 onChange={(e) => setUpper(e.target.checked)}
-                className="accent-emerald-500"
+                className="accent-accent"
               />
               Uppercase
             </label>
@@ -375,7 +375,7 @@ export function ulid() {
             <Textarea
               value={joined}
               readOnly
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-emerald-300 focus:ring-0"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-success focus:ring-0"
             />
           </Panel>
         </div>
@@ -390,21 +390,21 @@ export function ulid() {
               value={validateInput}
               onChange={(e) => setValidateInput(e.target.value)}
               placeholder="Paste ULIDs to validate…"
-              className="min-h-[10rem] border-0 bg-zinc-950 p-0 focus:ring-0"
+              className="min-h-[10rem] border-0 bg-sunken p-0 focus:ring-0"
             />
           </Panel>
           <Panel title="Results">
             {validations.length === 0 ? (
-              <p className="text-sm text-zinc-500">Validation results appear here…</p>
+              <p className="text-sm text-ink-faint">Validation results appear here…</p>
             ) : (
               <ul className="space-y-2">
                 {validations.map((row) => (
                   <li
                     key={row.line + row.detail}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 font-mono text-sm"
+                    className="rounded-xl border border-line bg-raised px-3 py-2 font-mono text-sm"
                   >
-                    <p className={row.ok ? "text-emerald-300" : "text-rose-300"}>{row.line}</p>
-                    <p className={`mt-1 text-xs ${row.ok ? "text-zinc-400" : "text-rose-400"}`}>
+                    <p className={row.ok ? "text-success" : "text-danger-ink"}>{row.line}</p>
+                    <p className={`mt-1 text-xs ${row.ok ? "text-ink-muted" : "text-danger-ink"}`}>
                       {row.ok ? `Valid · ${row.detail}` : row.detail}
                     </p>
                   </li>
@@ -472,7 +472,7 @@ export function cron() {
   return (
     <>
       <ToolHeader name={meta?.name ?? "Cron Expression"} description={meta?.description ?? ""} slug="cron" />
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
         <Button
           type="button"
           variant={!sixField ? "primary" : "outline"}
@@ -493,7 +493,7 @@ export function cron() {
         >
           6-field (Quartz / seconds)
         </Button>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-ink-faint">
           Human-readable text via cronstrue; next runs via cron-parser. Strict 6-field rules (e.g. no
           mixed day-of-month + weekday) apply only when using parser strict mode — not enabled here.
         </span>
@@ -711,7 +711,7 @@ export function datetime() {
     min?: number,
     max?: number,
   ) => (
-    <label className="flex flex-col gap-1 text-xs text-zinc-500">
+    <label className="flex flex-col gap-1 text-xs text-ink-faint">
       {label}
       <Input
         type="number"
@@ -734,16 +734,16 @@ export function datetime() {
         <Panel title="Now">
           <div className="flex flex-wrap gap-6 font-mono text-sm">
             <div>
-              <p className="text-xs text-zinc-500">Unix seconds</p>
+              <p className="text-xs text-ink-faint">Unix seconds</p>
               <div className="flex items-center gap-2">
-                <p className="text-emerald-300">{Math.floor(nowMs / 1000)}</p>
+                <p className="text-success">{Math.floor(nowMs / 1000)}</p>
                 <CopyButton value={String(Math.floor(nowMs / 1000))} />
               </div>
             </div>
             <div>
-              <p className="text-xs text-zinc-500">Unix milliseconds</p>
+              <p className="text-xs text-ink-faint">Unix milliseconds</p>
               <div className="flex items-center gap-2">
-                <p className="text-emerald-300">{nowMs}</p>
+                <p className="text-success">{nowMs}</p>
                 <CopyButton value={String(nowMs)} />
               </div>
             </div>
@@ -753,7 +753,7 @@ export function datetime() {
         <div className="grid gap-3 lg:grid-cols-2">
           <Panel title="Unix timestamp">
             <div className="space-y-3">
-              <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              <label className="flex flex-col gap-1 text-xs text-ink-faint">
                 Seconds
                 <Input
                   type="number"
@@ -765,7 +765,7 @@ export function datetime() {
                   }}
                 />
               </label>
-              <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              <label className="flex flex-col gap-1 text-xs text-ink-faint">
                 Milliseconds
                 <Input
                   type="number"
@@ -785,7 +785,7 @@ export function datetime() {
 
           <Panel title="Calendar">
             <div className="mb-3">
-              <label className="flex flex-col gap-1 text-xs text-zinc-500">
+              <label className="flex flex-col gap-1 text-xs text-ink-faint">
                 Timezone
                 <select
                   value={tz}
@@ -793,7 +793,7 @@ export function datetime() {
                     setSource("unix");
                     setTz(e.target.value);
                   }}
-                  className="h-11 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
+                  className="h-11 rounded-xl border border-line bg-sunken px-3 text-sm text-ink"
                 >
                   {[...new Set([browserTz, ...TIMEZONES])].map((z) => (
                     <option key={z} value={z}>
@@ -811,7 +811,7 @@ export function datetime() {
               {field("Minute", minute, setMinute, 0, 59)}
               {field("Second", second, setSecond, 0, 59)}
             </div>
-            <p className="mt-3 text-sm text-zinc-400">
+            <p className="mt-3 text-sm text-ink-muted">
               {metaParts.weekday} · day {metaParts.dayOfYear} · week {metaParts.week} · Q
               {metaParts.quarter}
             </p>
@@ -823,11 +823,11 @@ export function datetime() {
             {formats.map((f) => (
               <li
                 key={f.label}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-raised px-3 py-2"
               >
                 <div className="min-w-0">
-                  <p className="text-xs text-zinc-500">{f.label}</p>
-                  <p className="truncate font-mono text-sm text-zinc-100">{f.value}</p>
+                  <p className="text-xs text-ink-faint">{f.label}</p>
+                  <p className="truncate font-mono text-sm text-ink">{f.value}</p>
                 </div>
                 <CopyButton value={f.value} />
               </li>

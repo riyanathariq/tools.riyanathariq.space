@@ -138,15 +138,15 @@ function LinkedUnitFields({
           <label
             key={u.key}
             className={`flex flex-col gap-1 rounded-xl border px-3 py-2 ${
-              active === u.key ? "border-emerald-500/50 bg-zinc-900" : "border-zinc-800 bg-zinc-950"
+              active === u.key ? "border-success/50 bg-raised" : "border-line bg-sunken"
             }`}
           >
-            <span className="flex items-center justify-between gap-2 text-xs text-zinc-500">
+            <span className="flex items-center justify-between gap-2 text-xs text-ink-faint">
               <span>
                 {u.label}
                 {u.hintApprox ? " *" : ""}
               </span>
-              <span className="font-mono text-zinc-600">{u.key}</span>
+              <span className="font-mono text-ink-faint">{u.key}</span>
             </span>
             <Input
               value={display}
@@ -163,7 +163,7 @@ function LinkedUnitFields({
               }}
               className="h-10"
             />
-            {hint ? <span className="text-[11px] text-zinc-500">{hint}</span> : null}
+            {hint ? <span className="text-[11px] text-ink-faint">{hint}</span> : null}
           </label>
         );
       })}
@@ -207,7 +207,7 @@ export function unitsConverter() {
         description={meta?.description ?? ""}
         slug="units-converter"
       />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         {CATEGORIES.map((c) => (
           <Button
             key={c.id}
@@ -230,7 +230,7 @@ export function unitsConverter() {
               key === "d" || key === "h" || key === "min" ? humanizeSeconds(b) : null
             }
           />
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-ink-faint">
             * Months/Years use average Gregorian lengths (~30.44d / ~365.24d), not calendar months.
           </p>
         </div>
@@ -257,9 +257,9 @@ export function unitsConverter() {
           {(["C", "F", "K"] as const).map((u) => (
             <label
               key={u}
-              className="flex flex-col gap-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2"
+              className="flex flex-col gap-1 rounded-xl border border-line bg-sunken px-3 py-2"
             >
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-ink-faint">
                 {u === "C" ? "Celsius" : u === "F" ? "Fahrenheit" : "Kelvin"}
               </span>
               <Input
@@ -277,7 +277,7 @@ export function unitsConverter() {
       {category === "base" ? (
         <div className="space-y-3">
           {baseError ? (
-            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
               {baseError}
             </p>
           ) : null}
@@ -291,9 +291,9 @@ export function unitsConverter() {
           ).map((row) => (
             <label
               key={row.label}
-              className="flex flex-col gap-1 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2"
+              className="flex flex-col gap-1 rounded-xl border border-line bg-sunken px-3 py-2"
             >
-              <span className="text-xs text-zinc-500">{row.label}</span>
+              <span className="text-xs text-ink-faint">{row.label}</span>
               <Input
                 value={row.value}
                 onChange={(e) => {
@@ -331,13 +331,13 @@ export function asciiArt() {
   return (
     <>
       <ToolHeader name={meta?.name ?? "ASCII Art"} description={meta?.description ?? ""} slug="ascii-art" />
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-        <label className="flex items-center gap-2 text-sm text-zinc-400">
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+        <label className="flex items-center gap-2 text-sm text-ink-muted">
           Font
           <select
             value={font}
             onChange={(e) => setFont(e.target.value as FigletFontName)}
-            className="h-11 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
+            className="h-11 rounded-xl border border-line bg-sunken px-3 text-sm text-ink"
           >
             {FIGLET_FONTS.map((f) => (
               <option key={f} value={f}>
@@ -349,7 +349,7 @@ export function asciiArt() {
         <ClearButton onClick={() => setInput("")} />
       </div>
       <Panel title="Font preview (Aa)">
-        <pre className="overflow-x-auto whitespace-pre font-mono text-[10px] leading-tight text-zinc-400 sm:text-xs">
+        <pre className="overflow-x-auto whitespace-pre font-mono text-[10px] leading-tight text-ink-muted sm:text-xs">
           {preview}
         </pre>
       </Panel>
@@ -359,7 +359,7 @@ export function asciiArt() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type text…"
-            className="min-h-[12rem] border-0 bg-zinc-950 p-0 focus:ring-0"
+            className="min-h-[12rem] border-0 bg-sunken p-0 focus:ring-0"
           />
         </Panel>
         <Panel
@@ -371,7 +371,7 @@ export function asciiArt() {
             </>
           }
         >
-          <pre className="min-h-[12rem] overflow-auto whitespace-pre font-mono text-[10px] leading-tight text-emerald-300 sm:text-xs">
+          <pre className="min-h-[12rem] overflow-auto whitespace-pre font-mono text-[10px] leading-tight text-success sm:text-xs">
             {output}
           </pre>
         </Panel>

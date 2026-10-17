@@ -249,7 +249,7 @@ export function curlExplainer() {
         slug="curl-explainer"
       />
       <div className="flex h-full min-h-[28rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           {LANGS.map((l) => (
             <Button
               key={l.id}
@@ -263,7 +263,7 @@ export function curlExplainer() {
           <SampleButton onClick={() => setInput(SAMPLE)} />
         </div>
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -273,7 +273,7 @@ export function curlExplainer() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste a curl command…"
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
             />
           </Panel>
           <Panel
@@ -291,7 +291,7 @@ export function curlExplainer() {
               value={output}
               readOnly
               placeholder="Client code appears here…"
-              className="min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
+              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
             />
           </Panel>
         </div>

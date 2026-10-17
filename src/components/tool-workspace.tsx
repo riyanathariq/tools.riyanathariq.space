@@ -23,15 +23,15 @@ export function Panel({
   return (
     <section
       className={cn(
-        "flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950",
+        "flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-raised",
         className,
       )}
     >
-      <header className="flex items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-950 px-3 py-2.5">
-        <h2 className="text-xs font-medium tracking-wide text-zinc-400 uppercase">{title}</h2>
+      <header className="flex min-h-11 items-center justify-between gap-2 border-b border-line px-3 py-1.5">
+        <h2 className="font-mono text-[11px] font-medium tracking-[0.14em] text-ink-muted uppercase">{title}</h2>
         {actions ? <div className="flex items-center gap-1.5">{actions}</div> : null}
       </header>
-      <div className="min-h-0 flex-1 bg-zinc-950 p-3">{children}</div>
+      <div className="min-h-0 flex-1 p-3">{children}</div>
     </section>
   );
 }
@@ -52,7 +52,7 @@ export function CopyButton({ value }: { value: string }) {
       }}
       aria-label="Copy"
     >
-      {ok ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
+      {ok ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
       <span className="sr-only sm:not-sr-only sm:inline">{ok ? "Copied" : "Copy"}</span>
     </Button>
   );
@@ -118,12 +118,12 @@ export function TextIO({
   return (
     <div className="flex h-full min-h-[28rem] flex-col gap-3">
       {options ? (
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           {options}
         </div>
       ) : null}
       {error ? (
-        <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+        <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
           {error}
         </p>
       ) : null}
@@ -133,7 +133,7 @@ export function TextIO({
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Paste input here…"
-            className="min-h-[16rem] border-0 bg-zinc-950 p-0 focus:ring-0 lg:min-h-[22rem]"
+            className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0 lg:min-h-[22rem]"
           />
         </Panel>
         <Panel
@@ -149,7 +149,7 @@ export function TextIO({
             value={output}
             readOnly
             placeholder="Output appears here…"
-            className="min-h-[16rem] border-0 bg-zinc-950 p-0 focus:ring-0 lg:min-h-[22rem]"
+            className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0 lg:min-h-[22rem]"
           />
         </Panel>
       </div>
@@ -194,12 +194,12 @@ export function ToolHeader({
   return (
     <div className="mb-5" ref={rootRef}>
       <div className="flex items-start gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">{name}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{name}</h1>
         {help ? (
           <div className="relative pt-1">
             <button
               type="button"
-              className="inline-flex size-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-emerald-300"
+              className="inline-flex size-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-sunken hover:text-accent"
               aria-label="Tool information"
               aria-expanded={open}
               aria-controls={panelId}
@@ -212,26 +212,26 @@ export function ToolHeader({
                 id={panelId}
                 role="dialog"
                 aria-label={`${name} information`}
-                className="absolute top-full left-0 z-50 mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-2xl border border-zinc-700 bg-zinc-950 p-4 shadow-xl shadow-black/40"
+                className="absolute top-full left-0 z-50 mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-2xl border border-line-strong bg-raised p-4 shadow-pop"
               >
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <p className="text-xs font-medium tracking-wide text-zinc-400 uppercase">About</p>
+                  <p className="font-mono text-[11px] font-medium tracking-[0.14em] text-ink-muted uppercase">About</p>
                   <button
                     type="button"
-                    className="rounded-md p-1 text-zinc-500 hover:text-zinc-200"
+                    className="rounded-md p-1 text-ink-faint hover:text-ink"
                     aria-label="Close information"
                     onClick={() => setOpen(false)}
                   >
                     <X className="size-4" />
                   </button>
                 </div>
-                <p className="text-sm leading-relaxed text-zinc-300">{help}</p>
+                <p className="text-sm leading-relaxed text-ink-muted">{help}</p>
               </div>
             ) : null}
           </div>
         ) : null}
       </div>
-      <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-zinc-400">{description}</p>
+      <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-ink-muted">{description}</p>
     </div>
   );
 }

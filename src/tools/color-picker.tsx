@@ -130,9 +130,9 @@ const CHECKER =
 function CssRow({ label, value }: { label: string; value: string }) {
   const { toast } = useToast();
   return (
-    <div className="flex items-center gap-2 border-b border-zinc-800/80 py-2 last:border-0">
-      <span className="w-14 shrink-0 text-xs font-medium text-zinc-500 uppercase">{label}</span>
-      <code className="min-w-0 flex-1 truncate font-mono text-sm text-zinc-200">{value}</code>
+    <div className="flex items-center gap-2 border-b border-line py-2 last:border-0">
+      <span className="w-14 shrink-0 text-xs font-medium text-ink-faint uppercase">{label}</span>
+      <code className="min-w-0 flex-1 truncate font-mono text-sm text-ink">{value}</code>
       <Button
         type="button"
         variant="ghost"
@@ -143,7 +143,7 @@ function CssRow({ label, value }: { label: string; value: string }) {
           toast("Copied to clipboard");
         }}
       >
-        <Copy className="size-4 text-zinc-400" />
+        <Copy className="size-4 text-ink-muted" />
         <span className="sr-only">Copy</span>
       </Button>
     </div>
@@ -351,12 +351,12 @@ export function colorPicker() {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+        <div className="flex flex-col gap-3 rounded-2xl border border-line bg-sunken p-3">
           {/* SV plane */}
           <div
             ref={svRef}
             onPointerDown={startSv}
-            className="relative aspect-[4/3] w-full cursor-crosshair touch-none overflow-hidden rounded-xl border border-zinc-800"
+            className="relative aspect-[4/3] w-full cursor-crosshair touch-none overflow-hidden rounded-xl border border-line"
             style={{
               background: `
                 linear-gradient(to top, #000, transparent),
@@ -386,7 +386,7 @@ export function colorPicker() {
               <Pipette className="size-4" />
             </Button>
             <div
-              className="size-10 shrink-0 overflow-hidden rounded-full border border-zinc-700"
+              className="size-10 shrink-0 overflow-hidden rounded-full border border-line"
               style={{ backgroundImage: CHECKER, backgroundSize: "8px 8px", backgroundPosition: "0 0, 0 4px, 4px -4px, -4px 0" }}
             >
               <div className="size-full" style={{ backgroundColor: withAlpha }} />
@@ -395,7 +395,7 @@ export function colorPicker() {
               <div
                 ref={hueRef}
                 onPointerDown={startHue}
-                className="relative h-3.5 cursor-ew-resize touch-none rounded-full border border-zinc-800"
+                className="relative h-3.5 cursor-ew-resize touch-none rounded-full border border-line"
                 style={{
                   background:
                     "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
@@ -414,7 +414,7 @@ export function colorPicker() {
               <div
                 ref={alphaRef}
                 onPointerDown={startAlpha}
-                className="relative h-3.5 cursor-ew-resize touch-none overflow-hidden rounded-full border border-zinc-800"
+                className="relative h-3.5 cursor-ew-resize touch-none overflow-hidden rounded-full border border-line"
                 style={{ backgroundImage: CHECKER, backgroundSize: "8px 8px", backgroundPosition: "0 0, 0 4px, 4px -4px, -4px 0" }}
                 role="slider"
                 aria-label="Alpha"
@@ -445,7 +445,7 @@ export function colorPicker() {
               ] as const
             ).map(([label, value, onChange, min, max]) => (
               <label key={label} className="flex flex-col gap-1">
-                <span className="text-[10px] font-medium tracking-wide text-zinc-500 uppercase">{label}</span>
+                <span className="text-[10px] font-medium tracking-wide text-ink-faint uppercase">{label}</span>
                 <Input
                   type="number"
                   min={min}
@@ -457,7 +457,7 @@ export function colorPicker() {
               </label>
             ))}
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium tracking-wide text-zinc-500 uppercase">Hex</span>
+              <span className="text-[10px] font-medium tracking-wide text-ink-faint uppercase">Hex</span>
               <Input
                 value={hexInput}
                 onChange={(e) => applyFromHex(e.target.value)}
@@ -519,11 +519,11 @@ export function colorPicker() {
                   loadImage(e.dataTransfer.files?.[0]);
                 }}
                 onClick={() => fileRef.current?.click()}
-                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700 bg-zinc-950 px-4 py-12 text-center transition-colors hover:border-zinc-500 hover:bg-zinc-900/50"
+                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-sunken px-4 py-12 text-center transition-colors hover:border-line hover:bg-raised"
               >
-                <Upload className="size-8 text-zinc-500" />
-                <p className="text-sm text-zinc-300">Upload image</p>
-                <p className="text-xs text-zinc-500">Hover to preview color · click to lock</p>
+                <Upload className="size-8 text-ink-faint" />
+                <p className="text-sm text-ink-muted">Upload image</p>
+                <p className="text-xs text-ink-faint">Hover to preview color · click to lock</p>
                 <input
                   ref={fileRef}
                   type="file"
@@ -534,21 +534,21 @@ export function colorPicker() {
               </div>
             ) : (
               <div className="space-y-2">
-                {hoverHint ? <p className="text-xs text-zinc-500">{hoverHint}</p> : null}
+                {hoverHint ? <p className="text-xs text-ink-faint">{hoverHint}</p> : null}
                 <canvas
                   ref={canvasRef}
                   onPointerMove={(e) => sampleCanvas(e, "hover")}
                   onPointerDown={(e) => sampleCanvas(e, sampleLocked ? "force" : "lock")}
-                  className="max-h-[28rem] w-full cursor-crosshair rounded-xl border border-zinc-800 bg-zinc-900 object-contain"
+                  className="max-h-[28rem] w-full cursor-crosshair rounded-xl border border-line bg-raised object-contain"
                 />
                 <div className="flex items-center gap-2">
                   <div
-                    className="size-8 overflow-hidden rounded-lg border border-zinc-700"
+                    className="size-8 overflow-hidden rounded-lg border border-line"
                     style={{ backgroundImage: CHECKER, backgroundSize: "8px 8px" }}
                   >
                     <div className="size-full" style={{ backgroundColor: withAlpha }} />
                   </div>
-                  <code className="font-mono text-sm text-zinc-300">{hex8}</code>
+                  <code className="font-mono text-sm text-ink-muted">{hex8}</code>
                   <CopyButton value={hex8} />
                 </div>
               </div>

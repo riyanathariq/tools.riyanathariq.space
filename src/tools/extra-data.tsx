@@ -22,10 +22,9 @@ import {
 import { MARKDOWN_SAMPLE } from "@/data/markdown-preview-sample";
 import { getToolBySlug } from "@/data/tools-registry";
 
-import "highlight.js/styles/github-dark.css";
 
 const textareaClass =
-  "min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
+  "min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
 
 const mdMarked = new Marked(
   markedHighlight({
@@ -162,7 +161,7 @@ export function markdownPreview() {
         slug="markdown-preview"
       />
       <div className="flex min-h-[32rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           <SampleButton onClick={() => setInput(MARKDOWN_SAMPLE)} />
           <CopyButton value={input} />
           <DownloadButton value={input} filename="document.md" />
@@ -178,11 +177,11 @@ export function markdownPreview() {
             />
           </Panel>
           <Panel title="Preview">
-            <div className="min-h-[22rem] overflow-auto rounded-xl border border-zinc-800/80 bg-[#0c0c0e] p-4 sm:p-5 lg:min-h-[32rem]">
+            <div className="min-h-[22rem] overflow-auto rounded-xl border border-line bg-sunken p-4 sm:p-5 lg:min-h-[32rem]">
               {html ? (
                 <div className="md-preview" dangerouslySetInnerHTML={{ __html: html }} />
               ) : (
-                <p className="text-sm text-zinc-500">Preview appears here…</p>
+                <p className="text-sm text-ink-faint">Preview appears here…</p>
               )}
             </div>
           </Panel>
@@ -408,12 +407,12 @@ export function openapiViewer() {
         slug="openapi-viewer"
       />
       <div className="flex min-h-[28rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           <SampleButton onClick={() => setInput(OPENAPI_SAMPLE)} />
           <ClearButton onClick={() => setInput("")} />
         </div>
         {error ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -428,34 +427,34 @@ export function openapiViewer() {
           </Panel>
           <Panel title="Operations">
             {info ? (
-              <div className="mb-4 rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm">
-                <p className="font-medium text-zinc-100">{String(info.title ?? "Untitled API")}</p>
+              <div className="mb-4 rounded-xl border border-line bg-sunken p-3 text-sm">
+                <p className="font-medium text-ink">{String(info.title ?? "Untitled API")}</p>
                 {info.version != null ? (
-                  <p className="mt-1 text-zinc-500">Version {String(info.version)}</p>
+                  <p className="mt-1 text-ink-faint">Version {String(info.version)}</p>
                 ) : null}
                 {info.description ? (
-                  <p className="mt-2 text-zinc-400">{String(info.description)}</p>
+                  <p className="mt-2 text-ink-muted">{String(info.description)}</p>
                 ) : null}
               </div>
             ) : null}
             <div className="max-h-[22rem] space-y-2 overflow-auto">
               {endpoints.length === 0 ? (
-                <p className="text-sm text-zinc-500">No operations found.</p>
+                <p className="text-sm text-ink-faint">No operations found.</p>
               ) : (
                 endpoints.map((ep) => (
                   <div
                     key={`${ep.method}-${ep.path}`}
-                    className="rounded-xl border border-zinc-800 bg-zinc-950 p-3"
+                    className="rounded-xl border border-line bg-sunken p-3"
                   >
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 font-mono text-xs font-semibold text-emerald-300">
+                      <span className="rounded-md bg-success-soft px-2 py-0.5 font-mono text-xs font-semibold text-success">
                         {ep.method}
                       </span>
-                      <span className="font-mono text-sm text-zinc-200">{ep.path}</span>
+                      <span className="font-mono text-sm text-ink">{ep.path}</span>
                     </div>
-                    {ep.summary ? <p className="mt-2 text-sm text-zinc-400">{ep.summary}</p> : null}
+                    {ep.summary ? <p className="mt-2 text-sm text-ink-muted">{ep.summary}</p> : null}
                     {ep.operationId ? (
-                      <p className="mt-1 font-mono text-xs text-zinc-500">{ep.operationId}</p>
+                      <p className="mt-1 font-mono text-xs text-ink-faint">{ep.operationId}</p>
                     ) : null}
                   </div>
                 ))
@@ -540,7 +539,7 @@ export function urlParser() {
         slug="url-parser"
       />
       <div className="flex min-h-[28rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -551,7 +550,7 @@ export function urlParser() {
           <ClearButton onClick={() => setInput("")} />
         </div>
         {parseError ? (
-          <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
             {parseError}
           </p>
         ) : null}
@@ -570,9 +569,9 @@ export function urlParser() {
                     ["Password", parsed.password ? "••••" : "—"],
                   ] as const
                 ).map(([label, value]) => (
-                  <div key={label} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3">
-                    <dt className="text-xs uppercase tracking-wide text-zinc-500">{label}</dt>
-                    <dd className="mt-1 break-all font-mono text-sm text-zinc-200">{value}</dd>
+                  <div key={label} className="rounded-xl border border-line bg-sunken p-3">
+                    <dt className="text-xs uppercase tracking-wide text-ink-faint">{label}</dt>
+                    <dd className="mt-1 break-all font-mono text-sm text-ink">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -592,7 +591,7 @@ export function urlParser() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-zinc-800 text-left text-zinc-500">
+                    <tr className="border-b border-line text-left text-ink-faint">
                       <th className="pb-2 pr-3 font-medium">Key</th>
                       <th className="pb-2 pr-3 font-medium">Value</th>
                       <th className="pb-2 font-medium" />
@@ -601,13 +600,13 @@ export function urlParser() {
                   <tbody>
                     {params.length === 0 ? (
                       <tr>
-                        <td colSpan={3} className="py-4 text-zinc-500">
+                        <td colSpan={3} className="py-4 text-ink-faint">
                           No query parameters
                         </td>
                       </tr>
                     ) : (
                       params.map((row, i) => (
-                        <tr key={i} className="border-b border-zinc-800/60">
+                        <tr key={i} className="border-b border-line">
                           <td className="py-2 pr-3">
                             <Input
                               value={row.key}
@@ -649,7 +648,7 @@ export function urlParser() {
             </Panel>
             {rebuilt ? (
               <Panel title="Rebuilt URL" actions={<CopyButton value={rebuilt} />}>
-                <p className="break-all font-mono text-sm text-emerald-300">{rebuilt}</p>
+                <p className="break-all font-mono text-sm text-success">{rebuilt}</p>
               </Panel>
             ) : null}
           </>

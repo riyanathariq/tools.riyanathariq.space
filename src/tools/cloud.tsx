@@ -186,7 +186,7 @@ export function smtpTester() {
               ))}
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 Host
                 <Input
                   value={host}
@@ -200,7 +200,7 @@ export function smtpTester() {
                   autoComplete="off"
                 />
               </label>
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 Port
                 <Input
                   type="text"
@@ -217,7 +217,7 @@ export function smtpTester() {
                   autoComplete="off"
                 />
               </label>
-              <div className="space-y-1 text-sm text-zinc-400 sm:col-span-2">
+              <div className="space-y-1 text-sm text-ink-muted sm:col-span-2">
                 <p>Security</p>
                 <div className="grid grid-cols-3 gap-2 pt-1 sm:flex sm:flex-wrap">
                   {(["starttls", "ssl", "none"] as const).map((s) => (
@@ -233,7 +233,7 @@ export function smtpTester() {
                   ))}
                 </div>
               </div>
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 Username
                 <Input
                   value={username}
@@ -245,7 +245,7 @@ export function smtpTester() {
                   autoComplete="username"
                 />
               </label>
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 Password
                 <Input
                   type="password"
@@ -280,7 +280,7 @@ export function smtpTester() {
                   </>
                 )}
               </Button>
-              <p className="text-xs leading-relaxed text-zinc-500 sm:max-w-sm sm:text-right">
+              <p className="text-xs leading-relaxed text-ink-faint sm:max-w-sm sm:text-right">
                 Connect + AUTH only — no email is sent. Credentials are never stored.
               </p>
             </div>
@@ -290,20 +290,20 @@ export function smtpTester() {
                 className={cn(
                   "mt-3 flex gap-3 rounded-2xl border px-3.5 py-3 sm:px-4",
                   authResult.ok
-                    ? "border-emerald-500/30 bg-emerald-500/10"
-                    : "border-rose-500/30 bg-rose-500/10",
+                    ? "border-success/30 bg-success-soft"
+                    : "border-danger bg-danger-soft",
                 )}
               >
                 {authResult.ok ? (
-                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
                 ) : (
-                  <XCircle className="mt-0.5 size-5 shrink-0 text-rose-400" />
+                  <XCircle className="mt-0.5 size-5 shrink-0 text-danger-ink" />
                 )}
                 <div className="min-w-0 space-y-1">
                   <p
                     className={cn(
                       "text-sm font-medium",
-                      authResult.ok ? "text-emerald-300" : "text-rose-300",
+                      authResult.ok ? "text-success" : "text-danger-ink",
                     )}
                   >
                     {authResult.ok
@@ -311,7 +311,7 @@ export function smtpTester() {
                       : authResult.error || "Credential check failed"}
                   </p>
                   {authResult.host ? (
-                    <p className="break-all font-mono text-xs text-zinc-400">
+                    <p className="break-all font-mono text-xs text-ink-muted">
                       {authResult.host}:{authResult.port} · {authResult.security}
                     </p>
                   ) : null}
@@ -322,7 +322,7 @@ export function smtpTester() {
 
           <Panel title="Test email">
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 From
                 <Input
                   value={from}
@@ -332,7 +332,7 @@ export function smtpTester() {
                   autoComplete="email"
                 />
               </label>
-              <label className="space-y-1 text-sm text-zinc-400">
+              <label className="space-y-1 text-sm text-ink-muted">
                 To
                 <Input
                   value={to}
@@ -342,15 +342,15 @@ export function smtpTester() {
                   autoComplete="email"
                 />
               </label>
-              <label className="space-y-1 text-sm text-zinc-400 sm:col-span-2">
+              <label className="space-y-1 text-sm text-ink-muted sm:col-span-2">
                 Subject
                 <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
               </label>
             </div>
 
             <div className="mt-3 space-y-2">
-              <p className="text-sm text-zinc-400">Body</p>
-              <div className="grid grid-cols-2 gap-1 rounded-xl border border-zinc-800 bg-zinc-950 p-1 lg:hidden">
+              <p className="text-sm text-ink-muted">Body</p>
+              <div className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-sunken p-1 lg:hidden">
                 {(
                   [
                     { id: "editor", label: "Editor", icon: Code2 },
@@ -364,8 +364,8 @@ export function smtpTester() {
                     className={cn(
                       "inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-colors",
                       mobilePane === id
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200",
+                        ? "bg-success-soft text-success"
+                        : "text-ink-faint hover:bg-raised hover:text-ink",
                     )}
                   >
                     <Icon className="size-3.5" />
@@ -377,16 +377,16 @@ export function smtpTester() {
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4">
                 <section
                   className={cn(
-                    "flex h-[20rem] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 sm:h-[22rem]",
+                    "flex h-[20rem] flex-col overflow-hidden rounded-2xl border border-line bg-sunken sm:h-[22rem]",
                     mobilePane === "editor" ? "flex" : "hidden lg:flex",
                   )}
                 >
-                  <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2.5">
-                    <div className="flex items-center gap-2 text-zinc-300">
-                      <Code2 className="size-4 text-emerald-400" />
+                  <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-2.5">
+                    <div className="flex items-center gap-2 text-ink-muted">
+                      <Code2 className="size-4 text-success" />
                       <p className="text-sm font-medium">Editor</p>
                     </div>
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-ink-faint">
                       {looksLikeHtml(text) ? "HTML" : "Plain text"}
                     </p>
                   </div>
@@ -394,28 +394,28 @@ export function smtpTester() {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     spellCheck={false}
-                    className="h-full min-h-0 flex-1 resize-none rounded-none border-0 bg-zinc-950 px-3 py-3 font-mono text-xs leading-relaxed focus:border-transparent focus:ring-0"
+                    className="h-full min-h-0 flex-1 resize-none rounded-none border-0 bg-sunken px-3 py-3 font-mono text-xs leading-relaxed focus:border-transparent focus:ring-0"
                     placeholder="Plain text or HTML — empty uses a default test body"
                   />
                 </section>
 
                 <section
                   className={cn(
-                    "flex h-[20rem] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 sm:h-[22rem]",
+                    "flex h-[20rem] flex-col overflow-hidden rounded-2xl border border-line bg-sunken sm:h-[22rem]",
                     mobilePane === "preview" ? "flex" : "hidden lg:flex",
                   )}
                 >
-                  <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2.5">
-                    <div className="flex items-center gap-2 text-zinc-300">
-                      <Eye className="size-4 text-emerald-400" />
+                  <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-2.5">
+                    <div className="flex items-center gap-2 text-ink-muted">
+                      <Eye className="size-4 text-success" />
                       <p className="text-sm font-medium">Live Preview</p>
                     </div>
-                    <p className="max-w-[55%] truncate text-[11px] text-zinc-500">
+                    <p className="max-w-[55%] truncate text-[11px] text-ink-faint">
                       {subject || "—"}
                     </p>
                   </div>
-                  <div className="min-h-0 flex-1 bg-zinc-900/80 p-3 sm:p-4">
-                    <div className="mx-auto h-full max-w-[450px] overflow-hidden rounded-2xl border border-zinc-800 bg-white shadow-md">
+                  <div className="min-h-0 flex-1 bg-raised p-3 sm:p-4">
+                    <div className="mx-auto h-full max-w-[450px] overflow-hidden rounded-2xl border border-line bg-white shadow-md">
                       <iframe
                         title="Email body preview"
                         sandbox=""
@@ -456,19 +456,19 @@ export function smtpTester() {
                 className={cn(
                   "mb-3 flex gap-3 rounded-2xl border px-3.5 py-3",
                   sendResult.ok
-                    ? "border-emerald-500/30 bg-emerald-500/10"
-                    : "border-rose-500/30 bg-rose-500/10",
+                    ? "border-success/30 bg-success-soft"
+                    : "border-danger bg-danger-soft",
                 )}
               >
                 {sendResult.ok ? (
-                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
                 ) : (
-                  <XCircle className="mt-0.5 size-5 shrink-0 text-rose-400" />
+                  <XCircle className="mt-0.5 size-5 shrink-0 text-danger-ink" />
                 )}
                 <p
                   className={cn(
                     "text-sm font-medium",
-                    sendResult.ok ? "text-emerald-300" : "text-rose-300",
+                    sendResult.ok ? "text-success" : "text-danger-ink",
                   )}
                 >
                   {sendResult.ok
@@ -481,13 +481,13 @@ export function smtpTester() {
                   {sendResult.steps.map((s, i) => (
                     <li
                       key={`${s.step}-${i}`}
-                      className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 font-mono text-xs"
+                      className="rounded-xl border border-line bg-sunken px-3 py-2 font-mono text-xs"
                     >
-                      <span className={s.ok ? "text-emerald-400" : "text-rose-400"}>
+                      <span className={s.ok ? "text-success" : "text-danger-ink"}>
                         {s.ok ? "OK" : "FAIL"}
                       </span>{" "}
-                      <span className="text-zinc-400">{s.step}</span>
-                      <div className="mt-1 whitespace-pre-wrap break-all text-zinc-300">
+                      <span className="text-ink-muted">{s.step}</span>
+                      <div className="mt-1 whitespace-pre-wrap break-all text-ink-muted">
                         {s.detail}
                       </div>
                     </li>

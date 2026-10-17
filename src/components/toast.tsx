@@ -33,7 +33,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             : "translate-y-2 opacity-0",
         )}
       >
-        <div className="rounded-xl border border-emerald-500/30 bg-zinc-900/95 px-4 py-2.5 text-sm text-emerald-200 shadow-lg shadow-black/40 backdrop-blur-md">
+        <div className="rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-surface shadow-pop">
           {state.message}
         </div>
       </div>

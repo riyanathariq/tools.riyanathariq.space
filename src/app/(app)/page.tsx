@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { HomePageClient } from "@/app/(app)/home-page-client";
 import { JsonLd } from "@/components/json-ld";
@@ -25,7 +26,9 @@ export default function HomePage() {
   return (
     <>
       <JsonLd data={homeJsonLd(toolsRegistry)} />
-      <HomePageClient />
+      <Suspense fallback={null}>
+        <HomePageClient />
+      </Suspense>
     </>
   );
 }

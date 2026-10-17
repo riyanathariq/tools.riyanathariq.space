@@ -45,7 +45,7 @@ import { cn, copyText } from "@/lib/utils";
 
 function ErrorLine({ message }: { message: string | null }) {
   if (!message) return null;
-  return <p className="text-sm text-rose-400">{message}</p>;
+  return <p className="text-sm text-danger-ink">{message}</p>;
 }
 
 type ComboItem = { id: number; value: string; hint?: string };
@@ -192,9 +192,9 @@ function SearchCombobox({
               maxHeight: pos.maxHeight,
               zIndex: 80,
             }}
-            className="flex flex-col overflow-hidden rounded-xl border border-zinc-700 bg-zinc-950 shadow-lg shadow-black/50"
+            className="flex flex-col overflow-hidden rounded-xl border border-line bg-sunken shadow-pop"
           >
-            <div className="shrink-0 border-b border-zinc-800 p-2">
+            <div className="shrink-0 border-b border-line p-2">
               <Input
                 ref={inputRef}
                 value={query}
@@ -215,9 +215,9 @@ function SearchCombobox({
               style={{ maxHeight: Math.max(80, pos.maxHeight - 52) }}
             >
               {loading ? (
-                <li className="px-3 py-6 text-center text-sm text-zinc-500">Loading…</li>
+                <li className="px-3 py-6 text-center text-sm text-ink-faint">Loading…</li>
               ) : filtered.length === 0 ? (
-                <li className="px-3 py-6 text-center text-sm text-zinc-500">
+                <li className="px-3 py-6 text-center text-sm text-ink-faint">
                   {items.length === 0 ? emptyHint ?? "No options yet" : "No matches"}
                 </li>
               ) : (
@@ -230,27 +230,27 @@ function SearchCombobox({
                         type="button"
                         className={cn(
                           "flex w-full items-center gap-2 px-3 py-2 text-left text-sm",
-                          hi ? "bg-zinc-800/80" : "hover:bg-zinc-900",
-                          active && "text-emerald-300",
+                          hi ? "bg-sunken" : "hover:bg-raised",
+                          active && "text-success",
                         )}
                         onMouseEnter={() => setHighlight(idx)}
                         onClick={() => pick(item.id)}
                       >
-                        <span className="min-w-0 flex-1 truncate text-zinc-100">
+                        <span className="min-w-0 flex-1 truncate text-ink">
                           {item.value}
                           {item.hint ? (
-                            <span className="ml-1 text-zinc-500">{item.hint}</span>
+                            <span className="ml-1 text-ink-faint">{item.hint}</span>
                           ) : null}
                         </span>
-                        <span className="font-mono text-xs text-zinc-500">{item.id}</span>
-                        {active ? <Check className="size-3.5 text-emerald-400" /> : null}
+                        <span className="font-mono text-xs text-ink-faint">{item.id}</span>
+                        {active ? <Check className="size-3.5 text-success" /> : null}
                       </button>
                     </li>
                   );
                 })
               )}
             </ul>
-            <div className="shrink-0 border-t border-zinc-800 px-3 py-1.5 text-[11px] text-zinc-500">
+            <div className="shrink-0 border-t border-line px-3 py-1.5 text-[11px] text-ink-faint">
               {filtered.length}
               {query ? ` / ${items.length}` : ""} · ↑↓ Enter Esc
               {pos.placement === "top" ? " · opens up" : ""}
@@ -262,14 +262,14 @@ function SearchCombobox({
 
   return (
     <div ref={rootRef} className="relative block space-y-1.5">
-      <span className="flex items-center gap-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">
+      <span className="flex items-center gap-2 text-xs font-medium tracking-wide text-ink-faint uppercase">
         {label}
         {locked ? (
-          <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] tracking-normal text-zinc-400 normal-case">
+          <span className="rounded bg-sunken px-1.5 py-0.5 text-[10px] tracking-normal text-ink-muted normal-case">
             locked
           </span>
         ) : null}
-        {loading ? <Loader2 className="size-3.5 animate-spin text-zinc-400" /> : null}
+        {loading ? <Loader2 className="size-3.5 animate-spin text-ink-muted" /> : null}
       </span>
 
       <button
@@ -285,18 +285,18 @@ function SearchCombobox({
           });
         }}
         className={cn(
-          "flex h-10 w-full items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-left text-sm transition-colors",
+          "flex h-10 w-full items-center gap-2 rounded-xl border border-line bg-sunken px-3 text-left text-sm transition-colors",
           locked
-            ? "cursor-default border-zinc-800/80 bg-zinc-900/60 text-zinc-300"
-            : "hover:border-zinc-600",
-          open && !locked && "border-emerald-500/40 ring-2 ring-emerald-500/15",
+            ? "cursor-default border-line bg-raised text-ink-muted"
+            : "hover:border-line",
+          open && !locked && "border-success/40 ring-2 ring-ring/30",
         )}
       >
-        <span className={cn("min-w-0 flex-1 truncate", selected ? "text-zinc-100" : "text-zinc-500")}>
+        <span className={cn("min-w-0 flex-1 truncate", selected ? "text-ink" : "text-ink-faint")}>
           {selected ? (
             <>
               {selected.value}{" "}
-              <span className="font-mono text-zinc-500">({selected.id})</span>
+              <span className="font-mono text-ink-faint">({selected.id})</span>
             </>
           ) : (
             placeholder
@@ -307,7 +307,7 @@ function SearchCombobox({
             role="button"
             tabIndex={-1}
             aria-label={`Clear ${label}`}
-            className="rounded p-0.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
+            className="rounded p-0.5 text-ink-faint hover:bg-sunken hover:text-ink"
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -322,7 +322,7 @@ function SearchCombobox({
             <X className="size-3.5" />
           </span>
         ) : null}
-        <ChevronDown className={cn("size-4 shrink-0 text-zinc-500", open && "rotate-180")} />
+        <ChevronDown className={cn("size-4 shrink-0 text-ink-faint", open && "rotate-180")} />
       </button>
       {menu}
     </div>
@@ -355,14 +355,14 @@ function ResultCard({
   };
 
   return (
-    <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <div className="space-y-3 rounded-2xl border border-line bg-raised p-4">
       <div>
-        <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase">{title}</p>
-        <p className="mt-1 font-mono text-lg text-zinc-100">{kode || "—"}</p>
-        <p className="mt-1 text-sm text-zinc-300">{pathText || "Select a region"}</p>
+        <p className="text-xs font-medium tracking-wide text-ink-faint uppercase">{title}</p>
+        <p className="mt-1 font-mono text-lg text-ink">{kode || "—"}</p>
+        <p className="mt-1 text-sm text-ink-muted">{pathText || "Select a region"}</p>
         {postal ? (
-          <p className="mt-1 text-sm text-zinc-400">
-            Kode pos: <span className="font-mono text-zinc-200">{postal}</span>
+          <p className="mt-1 text-sm text-ink-muted">
+            Kode pos: <span className="font-mono text-ink">{postal}</span>
           </p>
         ) : null}
       </div>
@@ -380,10 +380,10 @@ function ResultCard({
           Copy API URL
         </Button>
       </div>
-      <pre className="max-h-56 overflow-auto rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-300">
+      <pre className="max-h-56 overflow-auto rounded-xl border border-line bg-sunken p-3 text-xs text-ink-muted">
         {jsonText}
       </pre>
-      {apiUrl ? <p className="break-all font-mono text-[11px] text-zinc-500">{apiUrl}</p> : null}
+      {apiUrl ? <p className="break-all font-mono text-[11px] text-ink-faint">{apiUrl}</p> : null}
     </div>
   );
 }
@@ -667,9 +667,9 @@ export function wilayahExplorer() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Cascade">
           <div className="space-y-3">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-ink-faint">
               Search inside each dropdown. Start from Kab/Kota — Provinsi locks from{" "}
-              <code className="text-zinc-400">province_id</code>.
+              <code className="text-ink-muted">province_id</code>.
             </p>
             <SearchCombobox
               label="Provinsi"
@@ -718,10 +718,10 @@ export function wilayahExplorer() {
               <ClearButton onClick={clear} />
             </div>
             <ErrorLine message={error} />
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-ink-faint">
               Data from{" "}
               <a
-                className="text-zinc-300 underline decoration-zinc-600 underline-offset-2 hover:text-white"
+                className="text-ink-muted underline decoration-line-strong underline-offset-2 hover:text-ink"
                 href="https://github.com/riyanathariq/wilayah-indonesia"
                 target="_blank"
                 rel="noreferrer"
@@ -729,7 +729,7 @@ export function wilayahExplorer() {
                 wilayah-indonesia
               </a>
               . See{" "}
-              <a className="text-zinc-300 underline decoration-zinc-600 underline-offset-2 hover:text-white" href="/t/wilayah-api">
+              <a className="text-ink-muted underline decoration-line-strong underline-offset-2 hover:text-ink" href="/t/wilayah-api">
                 API Docs
               </a>{" "}
               for integration.
@@ -803,7 +803,7 @@ export function wilayahLookup() {
         <Panel title="Kode">
           <div className="space-y-3">
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">
                 Kode wilayah
               </span>
               <Input
@@ -816,7 +816,7 @@ export function wilayahLookup() {
                 }}
               />
             </label>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-ink-faint">
               Accepts 2 (provinsi), 4 (kab/kota), 6 (kecamatan), or 10 (desa/kelurahan) digits.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -849,7 +849,7 @@ export function wilayahLookup() {
               postal={result.village?.postal_code}
             />
           ) : (
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-ink-faint">
               Paste a kode and hit Resolve. Hierarchy is fetched lazily from the static API.
             </p>
           )}
@@ -926,9 +926,9 @@ export function wilayahApi() {
     url: string;
     sample: string;
   }) => (
-    <div className="space-y-2 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-4">
+    <div className="space-y-2 rounded-2xl border border-line bg-raised p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-medium text-zinc-200">{title}</p>
+        <p className="text-sm font-medium text-ink">{title}</p>
         <div className="flex flex-wrap gap-1">
           <Button type="button" variant="ghost" className="h-8 px-2 text-xs" onClick={() => void copy("URL", url)}>
             Copy URL
@@ -941,8 +941,8 @@ export function wilayahApi() {
           </Button>
         </div>
       </div>
-      <p className="break-all font-mono text-[11px] text-emerald-400/90">{url}</p>
-      <pre className="overflow-auto rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-400">{sample}</pre>
+      <p className="break-all font-mono text-[11px] text-success">{url}</p>
+      <pre className="overflow-auto rounded-xl border border-line bg-sunken p-3 text-xs text-ink-muted">{sample}</pre>
     </div>
   );
 
@@ -955,18 +955,18 @@ export function wilayahApi() {
       />
       <div className="space-y-4">
         <Panel title="Contract">
-          <div className="space-y-3 text-sm text-zinc-300">
+          <div className="space-y-3 text-sm text-ink-muted">
             <p>
               Public static JSON API (no key). Base:{" "}
-              <code className="font-mono text-zinc-100">{WILAYAH_BASE}</code>
+              <code className="font-mono text-ink">{WILAYAH_BASE}</code>
             </p>
-            <ul className="list-inside list-disc space-y-1 text-zinc-400">
+            <ul className="list-inside list-disc space-y-1 text-ink-muted">
               <li>
-                CORS: <code className="text-zinc-300">Access-Control-Allow-Origin: *</code>
+                CORS: <code className="text-ink-muted">Access-Control-Allow-Origin: *</code>
               </li>
               <li>Source CSV → build → GitHub Pages via{" "}
                 <a
-                  className="text-zinc-200 underline decoration-zinc-600 underline-offset-2"
+                  className="text-ink underline decoration-line-strong underline-offset-2"
                   href="https://github.com/riyanathariq/wilayah-indonesia"
                   target="_blank"
                   rel="noreferrer"
@@ -975,10 +975,10 @@ export function wilayahApi() {
                 </a>
               </li>
               <li>
-                Kode lengths: <code className="text-zinc-300">2</code> provinsi ·{" "}
-                <code className="text-zinc-300">4</code> kab/kota ·{" "}
-                <code className="text-zinc-300">6</code> kecamatan ·{" "}
-                <code className="text-zinc-300">10</code> desa/kelurahan
+                Kode lengths: <code className="text-ink-muted">2</code> provinsi ·{" "}
+                <code className="text-ink-muted">4</code> kab/kota ·{" "}
+                <code className="text-ink-muted">6</code> kecamatan ·{" "}
+                <code className="text-ink-muted">10</code> desa/kelurahan
               </li>
             </ul>
           </div>
@@ -987,19 +987,19 @@ export function wilayahApi() {
         <Panel title="Path builder">
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">province_id</span>
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">province_id</span>
               <Input value={prov} onChange={(e) => setProv(e.target.value.replace(/\D/g, ""))} className="font-mono" />
             </label>
             <label className="space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">regency_id</span>
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">regency_id</span>
               <Input value={kab} onChange={(e) => setKab(e.target.value.replace(/\D/g, ""))} className="font-mono" />
             </label>
             <label className="space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">district_id</span>
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">district_id</span>
               <Input value={kec} onChange={(e) => setKec(e.target.value.replace(/\D/g, ""))} className="font-mono" />
             </label>
           </div>
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-ink-faint">
             IDs update the endpoint URLs below. Defaults match Jawa Barat → Kab. Bogor → Cibinong.
           </p>
         </Panel>
@@ -1016,7 +1016,7 @@ export function wilayahApi() {
         </div>
 
         <Panel title="Cascade integration pattern">
-          <pre className="overflow-auto rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-xs leading-relaxed text-zinc-300">{`// 1) Load provinces
+          <pre className="overflow-auto rounded-xl border border-line bg-sunken p-3 text-xs leading-relaxed text-ink-muted">{`// 1) Load provinces
 const provinces = await fetch("${WILAYAH_BASE}/provinces.json").then(r => r.json());
 
 // 2) On province pick → load kab/kota

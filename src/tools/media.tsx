@@ -55,13 +55,13 @@ function ImageDropzone({
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-8 text-center transition-colors",
         dragOver
-          ? "border-emerald-500/60 bg-emerald-500/5"
-          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+          ? "border-success/60 bg-success-soft"
+          : "border-line bg-sunken hover:border-line hover:bg-raised",
       )}
     >
-      <Upload className="size-8 text-zinc-500" />
-      <p className="text-sm text-zinc-300">{hasFile ? "Replace image" : "Upload Image"}</p>
-      <p className="text-xs text-zinc-500">Drop an image here or click to browse</p>
+      <Upload className="size-8 text-ink-faint" />
+      <p className="text-sm text-ink-muted">{hasFile ? "Replace image" : "Upload Image"}</p>
+      <p className="text-xs text-ink-faint">Drop an image here or click to browse</p>
       <input
         ref={inputRef}
         type="file"
@@ -251,10 +251,10 @@ export function imageConverter() {
         <ImageDropzone onFile={onFile} hasFile={!!preview} />
 
         {preview && tab === "convert" ? (
-          <div className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-line bg-sunken p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="truncate text-sm text-zinc-300">
-                <span className="text-zinc-500">File: </span>
+              <p className="truncate text-sm text-ink-muted">
+                <span className="text-ink-faint">File: </span>
                 {fileName}
               </p>
               <ClearButton onClick={clear} />
@@ -266,11 +266,11 @@ export function imageConverter() {
                   {f.split("/")[1].toUpperCase()}
                 </Button>
               ))}
-              <label className="text-sm text-zinc-400">
+              <label className="text-sm text-ink-muted">
                 Quality
                 <Input type="number" min={0.1} max={1} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="ml-2 inline-block w-20" />
               </label>
-              <label className="text-sm text-zinc-400">
+              <label className="text-sm text-ink-muted">
                 Max width
                 <Input type="number" min={100} max={4000} value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="ml-2 inline-block w-24" />
               </label>
@@ -282,16 +282,16 @@ export function imageConverter() {
 
             <Panel title="Preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={preview} alt="Preview" className="max-h-48 max-w-full rounded-xl border border-zinc-800" />
+              <img src={preview} alt="Preview" className="max-h-48 max-w-full rounded-xl border border-line" />
             </Panel>
           </div>
         ) : null}
 
         {preview && tab === "favicon" ? (
-          <div className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-line bg-sunken p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="truncate text-sm text-zinc-300">
-                <span className="text-zinc-500">File: </span>
+              <p className="truncate text-sm text-ink-muted">
+                <span className="text-ink-faint">File: </span>
                 {fileName}
               </p>
               <ClearButton onClick={clear} />
@@ -309,7 +309,7 @@ export function imageConverter() {
 
             <Panel title="Source preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={preview} alt="Source" className="max-h-32 max-w-full rounded-xl border border-zinc-800" />
+              <img src={preview} alt="Source" className="max-h-32 max-w-full rounded-xl border border-line" />
             </Panel>
 
             <Panel title="Favicon sizes">
@@ -317,9 +317,9 @@ export function imageConverter() {
                 {FAVICON_SIZES.map((size) => (
                   <div
                     key={size}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-3"
+                    className="flex flex-col items-center gap-2 rounded-xl border border-line bg-raised p-3"
                   >
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-ink-faint">
                       {size}×{size}
                     </p>
                     {generated[size] ? (
@@ -333,7 +333,7 @@ export function imageConverter() {
                         style={{ width: Math.min(size, 64), height: Math.min(size, 64) }}
                       />
                     ) : (
-                      <div className="flex size-12 items-center justify-center text-xs text-zinc-600">—</div>
+                      <div className="flex size-12 items-center justify-center text-xs text-ink-faint">—</div>
                     )}
                     <Button
                       type="button"
@@ -351,7 +351,7 @@ export function imageConverter() {
           </div>
         ) : null}
 
-        {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+        {error ? <p className="text-sm text-danger-ink">{error}</p> : null}
       </div>
     </>
   );
@@ -394,12 +394,12 @@ export function qrCode() {
         description={meta?.description ?? "Generate QR codes from text or URLs."}
         slug="qr-code"
       />
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
-        <label className="text-sm text-zinc-400">
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+        <label className="text-sm text-ink-muted">
           Size
           <Input type="number" min={128} max={1024} step={8} value={size} onChange={(e) => setSize(Number(e.target.value))} className="ml-2 inline-block w-24" />
         </label>
-        <span className="text-sm text-zinc-500">ECC</span>
+        <span className="text-sm text-ink-faint">ECC</span>
         {(["L", "M", "Q", "H"] as const).map((level) => (
           <Button key={level} type="button" variant={ecc === level ? "primary" : "outline"} onClick={() => setEcc(level)}>
             {level}
@@ -408,7 +408,7 @@ export function qrCode() {
       </div>
       <div className="grid gap-3 lg:grid-cols-2">
         <Panel title="Text / URL">
-          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem] border-0 bg-zinc-950 p-0 focus:ring-0" />
+          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem] border-0 bg-sunken p-0 focus:ring-0" />
         </Panel>
         <Panel
           title="QR Code"
@@ -421,12 +421,12 @@ export function qrCode() {
             ) : undefined
           }
         >
-          {error ? <p className="text-sm text-rose-400">{error}</p> : null}
+          {error ? <p className="text-sm text-danger-ink">{error}</p> : null}
           {dataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={dataUrl} alt="QR code" className="mx-auto rounded-xl bg-white p-3" />
           ) : (
-            <p className="text-sm text-zinc-500">Enter text to generate QR code</p>
+            <p className="text-sm text-ink-faint">Enter text to generate QR code</p>
           )}
         </Panel>
       </div>

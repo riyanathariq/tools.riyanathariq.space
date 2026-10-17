@@ -82,13 +82,13 @@ function PdfDropzone({
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-10 text-center transition-colors",
         dragOver
-          ? "border-emerald-500/60 bg-emerald-500/5"
-          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+          ? "border-success/60 bg-success-soft"
+          : "border-line bg-sunken hover:border-line hover:bg-raised",
       )}
     >
-      <Upload className="size-8 text-zinc-500" />
-      <p className="text-sm text-zinc-300">{label}</p>
-      <p className="text-xs text-zinc-500">PDF only · processed locally</p>
+      <Upload className="size-8 text-ink-faint" />
+      <p className="text-sm text-ink-muted">{label}</p>
+      <p className="text-xs text-ink-faint">PDF only · processed locally</p>
       <input
         ref={inputRef}
         type="file"
@@ -142,13 +142,13 @@ function ImageDropzone({
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-10 text-center transition-colors",
         dragOver
-          ? "border-emerald-500/60 bg-emerald-500/5"
-          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+          ? "border-success/60 bg-success-soft"
+          : "border-line bg-sunken hover:border-line hover:bg-raised",
       )}
     >
-      <FileUp className="size-8 text-zinc-500" />
-      <p className="text-sm text-zinc-300">Drop images here or click to browse</p>
-      <p className="text-xs text-zinc-500">JPG · PNG · WebP · local only</p>
+      <FileUp className="size-8 text-ink-faint" />
+      <p className="text-sm text-ink-muted">Drop images here or click to browse</p>
+      <p className="text-xs text-ink-faint">JPG · PNG · WebP · local only</p>
       <input
         ref={inputRef}
         type="file"
@@ -180,7 +180,7 @@ function BusyButton({
 function ErrorLine({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+    <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
       {message}
     </p>
   );
@@ -242,21 +242,21 @@ export function pdfMerge() {
                 {files.map((f, i) => (
                   <li
                     key={`${f.name}-${i}`}
-                    className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2"
+                    className="flex items-center gap-2 rounded-xl border border-line bg-raised px-3 py-2"
                   >
-                    <span className="min-w-0 flex-1 truncate text-sm text-zinc-200">
+                    <span className="min-w-0 flex-1 truncate text-sm text-ink">
                       {f.name}
-                      <span className="ml-2 text-xs text-zinc-500">{formatBytes(f.size)}</span>
+                      <span className="ml-2 text-xs text-ink-faint">{formatBytes(f.size)}</span>
                     </span>
-                    <button type="button" className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, -1)} aria-label="Move up">
+                    <button type="button" className="rounded-lg p-1.5 text-ink-muted hover:bg-sunken" onClick={() => move(i, -1)} aria-label="Move up">
                       <ArrowUp className="size-4" />
                     </button>
-                    <button type="button" className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, 1)} aria-label="Move down">
+                    <button type="button" className="rounded-lg p-1.5 text-ink-muted hover:bg-sunken" onClick={() => move(i, 1)} aria-label="Move down">
                       <ArrowDown className="size-4" />
                     </button>
                     <button
                       type="button"
-                      className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-rose-300"
+                      className="rounded-lg p-1.5 text-ink-muted hover:bg-sunken hover:text-danger-ink"
                       onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
                       aria-label="Remove"
                     >
@@ -276,7 +276,7 @@ export function pdfMerge() {
           </div>
         </Panel>
         <Panel title="Notes">
-          <ul className="space-y-2 text-sm leading-relaxed text-zinc-400">
+          <ul className="space-y-2 text-sm leading-relaxed text-ink-muted">
             <li>· Order in the list is the order in the merged file.</li>
             <li>· Encrypted PDFs may fail unless the viewer can ignore encryption.</li>
             <li>· Everything runs in your browser — nothing is uploaded.</li>
@@ -372,13 +372,13 @@ export function pdfSplit() {
               label={file ? "Replace PDF" : "Drop a PDF to split"}
             />
             {file ? (
-              <p className="text-sm text-zinc-300">
+              <p className="text-sm text-ink-muted">
                 {file.name} · {formatBytes(file.size)}
                 {pageCount ? ` · ${pageCount} pages` : ""}
               </p>
             ) : null}
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">
                 Page range
               </span>
               <Input
@@ -411,7 +411,7 @@ export function pdfSplit() {
           </div>
         </Panel>
         <Panel title="Examples">
-          <ul className="space-y-2 font-mono text-sm text-zinc-400">
+          <ul className="space-y-2 font-mono text-sm text-ink-muted">
             <li>1-5 → pages 1 through 5</li>
             <li>1,3,7 → pages 1, 3, and 7</li>
             <li>2-4,8-10 → ranges combined</li>
@@ -530,7 +530,7 @@ export function pdfOrganize() {
               <PdfDropzone onFiles={(fs) => void load(fs[0]!)} label="Drop a PDF to organize" />
             ) : null}
             {loading ? (
-              <p className="flex items-center gap-2 text-sm text-zinc-400">
+              <p className="flex items-center gap-2 text-sm text-ink-muted">
                 <Loader2 className="size-4 animate-spin" /> Rendering thumbnails…
               </p>
             ) : null}
@@ -539,9 +539,9 @@ export function pdfOrganize() {
                 {pages.map((p, i) => (
                   <li
                     key={`${p.sourceIndex}-${i}`}
-                    className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50"
+                    className="overflow-hidden rounded-xl border border-line bg-raised"
                   >
-                    <div className="flex aspect-[3/4] items-center justify-center bg-zinc-950 p-2">
+                    <div className="flex aspect-[3/4] items-center justify-center bg-sunken p-2">
                       {p.thumb ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -552,22 +552,22 @@ export function pdfOrganize() {
                         />
                       ) : null}
                     </div>
-                    <div className="flex items-center justify-between gap-1 border-t border-zinc-800 px-2 py-1.5">
-                      <span className="font-mono text-[11px] text-zinc-500">
+                    <div className="flex items-center justify-between gap-1 border-t border-line px-2 py-1.5">
+                      <span className="font-mono text-[11px] text-ink-faint">
                         p{p.sourceIndex + 1}
                         {p.rotation ? ` · ${p.rotation}°` : ""}
                       </span>
                       <div className="flex">
-                        <button type="button" className="rounded p-1 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, -1)} aria-label="Move earlier">
+                        <button type="button" className="rounded p-1 text-ink-muted hover:bg-sunken" onClick={() => move(i, -1)} aria-label="Move earlier">
                           <ArrowUp className="size-3.5" />
                         </button>
-                        <button type="button" className="rounded p-1 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, 1)} aria-label="Move later">
+                        <button type="button" className="rounded p-1 text-ink-muted hover:bg-sunken" onClick={() => move(i, 1)} aria-label="Move later">
                           <ArrowDown className="size-3.5" />
                         </button>
-                        <button type="button" className="rounded p-1 text-zinc-400 hover:bg-zinc-800" onClick={() => rotate(i)} aria-label="Rotate">
+                        <button type="button" className="rounded p-1 text-ink-muted hover:bg-sunken" onClick={() => rotate(i)} aria-label="Rotate">
                           <RotateCw className="size-3.5" />
                         </button>
-                        <button type="button" className="rounded p-1 text-zinc-400 hover:bg-zinc-800 hover:text-rose-300" onClick={() => remove(i)} aria-label="Delete page">
+                        <button type="button" className="rounded p-1 text-ink-muted hover:bg-sunken hover:text-danger-ink" onClick={() => remove(i)} aria-label="Delete page">
                           <Trash2 className="size-3.5" />
                         </button>
                       </div>
@@ -646,19 +646,19 @@ export function imagesToPdf() {
             {files.length ? (
               <ul className="space-y-2">
                 {files.map((f, i) => (
-                  <li key={`${f.name}-${i}`} className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">
+                  <li key={`${f.name}-${i}`} className="flex items-center gap-3 rounded-xl border border-line bg-raised p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={previews[i]?.url} alt="" className="size-12 rounded-lg object-cover" />
-                    <span className="min-w-0 flex-1 truncate text-sm text-zinc-200">{f.name}</span>
-                    <button type="button" className="rounded p-1.5 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, -1)}>
+                    <span className="min-w-0 flex-1 truncate text-sm text-ink">{f.name}</span>
+                    <button type="button" className="rounded p-1.5 text-ink-muted hover:bg-sunken" onClick={() => move(i, -1)}>
                       <ArrowUp className="size-4" />
                     </button>
-                    <button type="button" className="rounded p-1.5 text-zinc-400 hover:bg-zinc-800" onClick={() => move(i, 1)}>
+                    <button type="button" className="rounded p-1.5 text-ink-muted hover:bg-sunken" onClick={() => move(i, 1)}>
                       <ArrowDown className="size-4" />
                     </button>
                     <button
                       type="button"
-                      className="rounded p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-rose-300"
+                      className="rounded p-1.5 text-ink-muted hover:bg-sunken hover:text-danger-ink"
                       onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
                     >
                       <Trash2 className="size-4" />
@@ -672,9 +672,9 @@ export function imagesToPdf() {
         <Panel title="Options">
           <div className="space-y-3">
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">Page size</span>
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">Page size</span>
               <select
-                className="h-10 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
+                className="h-10 w-full rounded-xl border border-line bg-sunken px-3 text-sm text-ink"
                 value={page}
                 onChange={(e) => setPage(e.target.value as typeof page)}
               >
@@ -683,7 +683,7 @@ export function imagesToPdf() {
                 <option value="letter">Letter</option>
               </select>
             </label>
-            <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <label className="flex items-center gap-2 text-sm text-ink-muted">
               <input
                 type="checkbox"
                 checked={landscape}
@@ -757,7 +757,7 @@ export function pdfToImages() {
               label={file ? "Replace PDF" : "Drop a PDF"}
             />
             {file ? (
-              <p className="text-sm text-zinc-300">
+              <p className="text-sm text-ink-muted">
                 {file.name} · {formatBytes(file.size)}
               </p>
             ) : null}
@@ -766,9 +766,9 @@ export function pdfToImages() {
         <Panel title="Export">
           <div className="space-y-3">
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">Format</span>
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">Format</span>
               <select
-                className="h-10 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm"
+                className="h-10 w-full rounded-xl border border-line bg-sunken px-3 text-sm"
                 value={format}
                 onChange={(e) => setFormat(e.target.value as "png" | "jpeg")}
               >
@@ -777,7 +777,7 @@ export function pdfToImages() {
               </select>
             </label>
             <label className="block space-y-1.5">
-              <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
+              <span className="text-xs font-medium tracking-wide text-ink-faint uppercase">
                 Scale ({scale}×)
               </span>
               <input
@@ -855,7 +855,7 @@ export function pdfCompress() {
               label={file ? "Replace PDF" : "Drop a PDF to compress"}
             />
             {file ? (
-              <p className="text-sm text-zinc-300">
+              <p className="text-sm text-ink-muted">
                 {file.name} · {formatBytes(file.size)}
               </p>
             ) : null}
@@ -872,15 +872,15 @@ export function pdfCompress() {
                   className={cn(
                     "rounded-full border px-3 py-1.5 text-xs capitalize",
                     preset === p
-                      ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-200"
-                      : "border-zinc-700 text-zinc-400 hover:border-zinc-500",
+                      ? "border-success/50 bg-success-soft text-success"
+                      : "border-line text-ink-muted hover:border-line",
                   )}
                 >
                   {p}
                 </button>
               ))}
             </div>
-            <p className="text-xs leading-relaxed text-zinc-500">
+            <p className="text-xs leading-relaxed text-ink-faint">
               Re-renders each page as JPEG. Best for photo/scan PDFs. Pure text PDFs may not shrink
               much (or can grow).
             </p>
@@ -897,7 +897,7 @@ export function pdfCompress() {
               />
             </div>
             {result ? (
-              <p className="font-mono text-sm text-emerald-300/90">
+              <p className="font-mono text-sm text-success">
                 {formatBytes(result.before)} → {formatBytes(result.after)} (
                 {result.after < result.before
                   ? `−${Math.round((1 - result.after / result.before) * 100)}%`

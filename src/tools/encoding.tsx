@@ -267,14 +267,14 @@ function FileDropzone({
       className={cn(
         "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-8 text-center transition-colors",
         dragOver
-          ? "border-emerald-500/60 bg-emerald-500/5"
-          : "border-zinc-700 bg-zinc-950 hover:border-zinc-500 hover:bg-zinc-900/50",
+          ? "border-success/60 bg-success-soft"
+          : "border-line bg-sunken hover:border-line hover:bg-raised",
         disabled && "pointer-events-none opacity-50",
       )}
     >
-      <Upload className="size-8 text-zinc-500" />
-      <p className="text-sm text-zinc-300">{label}</p>
-      <p className="text-xs text-zinc-500">Drop a file here or click to browse</p>
+      <Upload className="size-8 text-ink-faint" />
+      <p className="text-sm text-ink-muted">{label}</p>
+      <p className="text-xs text-ink-faint">Drop a file here or click to browse</p>
       <input
         ref={inputRef}
         type="file"
@@ -434,7 +434,7 @@ function Base64FileTool() {
 
   return (
     <div className="flex min-h-[28rem] flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
         {(["encode", "decode"] as const).map((m) => (
           <Button
             key={m}
@@ -456,11 +456,11 @@ function Base64FileTool() {
             disabled={encodeBlocked}
           />
           {encodeFile ? (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300">
-              <span className="text-zinc-500">File:</span> {encodeFile.name}{" "}
-              <span className="text-zinc-500">· MIME:</span>{" "}
+            <div className="rounded-xl border border-line bg-raised px-3 py-2 text-sm text-ink-muted">
+              <span className="text-ink-faint">File:</span> {encodeFile.name}{" "}
+              <span className="text-ink-faint">· MIME:</span>{" "}
               {encodeFile.type || "application/octet-stream"}{" "}
-              <span className="text-zinc-500">· Size:</span>{" "}
+              <span className="text-ink-faint">· Size:</span>{" "}
               {formatFileSize(encodeFile.size)}
             </div>
           ) : null}
@@ -469,8 +469,8 @@ function Base64FileTool() {
               className={cn(
                 "rounded-xl border px-3 py-2 text-sm",
                 encodeBlocked
-                  ? "border-rose-500/30 bg-rose-500/10 text-rose-300"
-                  : "border-amber-500/30 bg-amber-500/10 text-amber-200",
+                  ? "border-danger bg-danger-soft text-danger-ink"
+                  : "border-premium/40 bg-premium-soft text-premium-ink",
               )}
             >
               {encodeError}
@@ -510,7 +510,7 @@ function Base64FileTool() {
                 <Textarea
                   value={encodeOutput}
                   readOnly
-                  className="min-h-[16rem] border-0 bg-zinc-950 p-0 focus:ring-0 lg:min-h-[20rem]"
+                  className="min-h-[16rem] border-0 bg-sunken p-0 focus:ring-0 lg:min-h-[20rem]"
                 />
               </Panel>
             </>
@@ -539,27 +539,27 @@ function Base64FileTool() {
               value={decodeInput}
               onChange={(e) => setDecodeInput(e.target.value)}
               placeholder="Paste Base64 or a data:…;base64, URL…"
-              className="min-h-[12rem] border-0 bg-zinc-950 p-0 focus:ring-0"
+              className="min-h-[12rem] border-0 bg-sunken p-0 focus:ring-0"
             />
           </Panel>
           {decodeError ? (
-            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+            <p className="rounded-xl border border-danger bg-danger-soft px-3 py-2 text-sm text-danger-ink">
               {decodeError}
             </p>
           ) : null}
           {decodedBlob ? (
             <>
-              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-300">
+              <div className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-raised px-3 py-2 text-sm text-ink-muted">
                 <span>
-                  <span className="text-zinc-500">MIME:</span> {decodedMime}
+                  <span className="text-ink-faint">MIME:</span> {decodedMime}
                 </span>
                 <span>
-                  <span className="text-zinc-500">Size:</span>{" "}
+                  <span className="text-ink-faint">Size:</span>{" "}
                   {formatFileSize(decodedBlob.size)}
                 </span>
                 {decodeFileName ? (
                   <span>
-                    <span className="text-zinc-500">Source:</span> {decodeFileName}
+                    <span className="text-ink-faint">Source:</span> {decodeFileName}
                   </span>
                 ) : null}
                 <Button type="button" onClick={downloadDecoded}>
@@ -581,19 +581,19 @@ function Base64FileTool() {
                   <iframe
                     src={objectUrl}
                     title="PDF preview"
-                    className="h-[28rem] w-full rounded-xl border border-zinc-800 bg-zinc-950"
+                    className="h-[28rem] w-full rounded-xl border border-line bg-sunken"
                   />
                 </Panel>
               ) : null}
               {previewKind === "text" && textPreview != null ? (
                 <Panel title="Preview">
-                  <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm text-zinc-200">
+                  <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm text-ink">
                     {textPreview}
                   </pre>
                 </Panel>
               ) : null}
               {previewKind === "none" ? (
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-ink-faint">
                   No inline preview for this type — use Download file.
                 </p>
               ) : null}

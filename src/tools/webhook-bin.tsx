@@ -41,17 +41,17 @@ type MobilePane = "list" | "detail";
 type DetailTab = "body" | "headers" | "query";
 
 const METHOD_STYLES: Record<string, string> = {
-  GET: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  POST: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  PUT: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  PATCH: "bg-violet-500/15 text-violet-300 border-violet-500/30",
-  DELETE: "bg-rose-500/15 text-rose-300 border-rose-500/30",
-  HEAD: "bg-zinc-500/15 text-zinc-300 border-zinc-500/30",
-  OPTIONS: "bg-zinc-500/15 text-zinc-300 border-zinc-500/30",
+  GET: "bg-success-soft text-success border-success/30",
+  POST: "bg-accent-soft text-accent-ink border-accent/40",
+  PUT: "bg-premium-soft text-premium-ink border-premium/40",
+  PATCH: "bg-accent-soft text-accent-ink border-accent/40",
+  DELETE: "bg-danger-soft text-danger-ink border-danger",
+  HEAD: "bg-sunken text-ink-muted border-line",
+  OPTIONS: "bg-sunken text-ink-muted border-line",
 };
 
 function methodClass(method: string) {
-  return METHOD_STYLES[method.toUpperCase()] ?? "bg-zinc-500/15 text-zinc-300 border-zinc-500/30";
+  return METHOD_STYLES[method.toUpperCase()] ?? "bg-sunken text-ink-muted border-line";
 }
 
 function formatBytes(n: number) {
@@ -310,7 +310,7 @@ export function webhookBin() {
       <CloudGate toolName="Webhook Bin">
         <div className="flex flex-col gap-3">
           {error ? (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+            <div className="rounded-2xl border border-danger bg-danger-soft px-4 py-3 text-sm text-danger-ink">
               {error}
             </div>
           ) : null}
@@ -319,15 +319,15 @@ export function webhookBin() {
             title="Your bins"
             actions={
               limits ? (
-                <span className="text-[11px] text-zinc-500">
+                <span className="text-[11px] text-ink-faint">
                   {bins.length}/{limits.maxBinsPerUser} · {limits.ttlHours}h TTL
                 </span>
               ) : null
             }
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <label className="min-w-0 flex-1 space-y-1 text-sm text-zinc-400">
-                Name <span className="text-zinc-600">(optional)</span>
+              <label className="min-w-0 flex-1 space-y-1 text-sm text-ink-muted">
+                Name <span className="text-ink-faint">(optional)</span>
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -347,13 +347,13 @@ export function webhookBin() {
             </div>
 
             {loading ? (
-              <p className="mt-4 animate-pulse text-sm text-zinc-500">Loading bins…</p>
+              <p className="mt-4 animate-pulse text-sm text-ink-faint">Loading bins…</p>
             ) : bins.length === 0 ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/40 px-4 py-8 text-center">
-                <Inbox className="mx-auto mb-3 size-8 text-zinc-600" />
-                <p className="text-sm font-medium text-zinc-200">No bins yet</p>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Create one to get a public <span className="font-mono text-zinc-400">/hook/…</span>{" "}
+              <div className="mt-4 rounded-2xl border border-dashed border-line bg-raised px-4 py-8 text-center">
+                <Inbox className="mx-auto mb-3 size-8 text-ink-faint" />
+                <p className="text-sm font-medium text-ink">No bins yet</p>
+                <p className="mt-1 text-sm text-ink-faint">
+                  Create one to get a public <span className="font-mono text-ink-muted">/hook/…</span>{" "}
                   URL. Point Stripe, GitHub, or curl at it.
                 </p>
               </div>
@@ -369,13 +369,13 @@ export function webhookBin() {
                       className={cn(
                         "min-w-[10rem] shrink-0 rounded-2xl border px-3 py-2.5 text-left transition-colors",
                         active
-                          ? "border-emerald-500/40 bg-emerald-500/10"
-                          : "border-zinc-800 bg-zinc-950 hover:border-zinc-700",
+                          ? "border-success/40 bg-success-soft"
+                          : "border-line bg-sunken hover:border-line",
                       )}
                     >
-                      <p className="truncate text-sm font-medium text-zinc-100">{bin.name}</p>
-                      <p className="mt-1 font-mono text-[11px] text-zinc-500">{bin.id.slice(0, 10)}…</p>
-                      <p className="mt-1 text-[11px] text-zinc-500">
+                      <p className="truncate text-sm font-medium text-ink">{bin.name}</p>
+                      <p className="mt-1 font-mono text-[11px] text-ink-faint">{bin.id.slice(0, 10)}…</p>
+                      <p className="mt-1 text-[11px] text-ink-faint">
                         {bin.hitCount} hit{bin.hitCount === 1 ? "" : "s"}
                       </p>
                     </button>
@@ -397,14 +397,14 @@ export function webhookBin() {
                       className={cn(
                         "inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium",
                         listening
-                          ? "bg-emerald-500/15 text-emerald-300"
-                          : "bg-zinc-800 text-zinc-400",
+                          ? "bg-success-soft text-success"
+                          : "bg-sunken text-ink-muted",
                       )}
                     >
                       <span
                         className={cn(
                           "size-1.5 rounded-full",
-                          listening ? "animate-pulse bg-emerald-400" : "bg-zinc-500",
+                          listening ? "animate-pulse bg-accent" : "bg-line-strong",
                         )}
                       />
                       {listening ? "Live" : "Paused"}
@@ -426,7 +426,7 @@ export function webhookBin() {
                     <Button
                       type="button"
                       variant="ghost"
-                      className="h-9 min-h-9 px-2.5 text-rose-300 hover:text-rose-200"
+                      className="h-9 min-h-9 px-2.5 text-danger-ink hover:text-danger-ink"
                       onClick={() => void onDelete()}
                       aria-label="Delete bin"
                     >
@@ -436,35 +436,35 @@ export function webhookBin() {
                 }
               >
                 <div className="space-y-3">
-                  <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-zinc-950 to-zinc-950 p-4">
-                    <div className="mt-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                  <div className="flex items-start gap-3 rounded-2xl border border-success/20 bg-gradient-to-br from-accent-soft via-surface to-surface p-4">
+                    <div className="mt-0.5 inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-success/30 bg-success-soft text-success">
                       <Radio className="size-5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium text-zinc-100">{activeBin.name}</p>
-                        <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-400">
+                        <p className="text-sm font-medium text-ink">{activeBin.name}</p>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-line px-2 py-0.5 text-[10px] text-ink-muted">
                           <Clock3 className="size-3" />
                           {formatExpiresIn(activeBin.expiresAt)}
                         </span>
                       </div>
-                      <p className="mt-2 break-all font-mono text-xs leading-relaxed text-emerald-300/90 sm:text-sm">
+                      <p className="mt-2 break-all font-mono text-xs leading-relaxed text-success sm:text-sm">
                         {hookUrl}
                       </p>
-                      <p className="mt-2 text-xs text-zinc-500">
+                      <p className="mt-2 text-xs text-ink-faint">
                         Accepts any method. Trailing paths work too — e.g.{" "}
-                        <span className="font-mono text-zinc-400">{hookUrl}/events</span>
+                        <span className="font-mono text-ink-muted">{hookUrl}/events</span>
                       </p>
                     </div>
                   </div>
 
-                  <pre className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 font-mono text-[11px] leading-relaxed text-zinc-400">
+                  <pre className="overflow-x-auto rounded-xl border border-line bg-raised p-3 font-mono text-[11px] leading-relaxed text-ink-muted">
                     {curlSample(hookUrl)}
                   </pre>
                 </div>
               </Panel>
 
-              <div className="grid grid-cols-2 gap-1 rounded-xl border border-zinc-800 bg-zinc-950 p-1 lg:hidden">
+              <div className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-sunken p-1 lg:hidden">
                 {(
                   [
                     { id: "list", label: "Requests", icon: Activity },
@@ -478,14 +478,14 @@ export function webhookBin() {
                     className={cn(
                       "inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-xs font-medium transition-colors",
                       mobilePane === id
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200",
+                        ? "bg-success-soft text-success"
+                        : "text-ink-faint hover:bg-raised hover:text-ink",
                     )}
                   >
                     <Icon className="size-3.5" />
                     {label}
                     {id === "list" && hits.length > 0 ? (
-                      <span className="rounded-full bg-zinc-800 px-1.5 text-[10px] text-zinc-300">
+                      <span className="rounded-full bg-sunken px-1.5 text-[10px] text-ink-muted">
                         {hits.length}
                       </span>
                     ) : null}
@@ -496,17 +496,17 @@ export function webhookBin() {
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-4">
                 <section
                   className={cn(
-                    "flex h-[24rem] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 sm:h-[28rem]",
+                    "flex h-[24rem] flex-col overflow-hidden rounded-2xl border border-line bg-sunken sm:h-[28rem]",
                     mobilePane === "list" ? "flex" : "hidden lg:flex",
                   )}
                 >
-                  <header className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2.5">
+                  <header className="flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-2.5">
                     <div className="flex items-center gap-2">
-                      <Activity className="size-4 text-emerald-400" />
-                      <h2 className="text-xs font-medium tracking-wide text-zinc-400 uppercase">
+                      <Activity className="size-4 text-success" />
+                      <h2 className="text-xs font-medium tracking-wide text-ink-muted uppercase">
                         Incoming
                       </h2>
-                      <span className="text-[11px] text-zinc-500">{hits.length}</span>
+                      <span className="text-[11px] text-ink-faint">{hits.length}</span>
                     </div>
                     <ClearButton onClick={() => void onClear()} />
                   </header>
@@ -515,14 +515,14 @@ export function webhookBin() {
                     {hits.length === 0 ? (
                       <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center">
                         <div className="relative">
-                          <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/20" />
-                          <div className="relative inline-flex size-12 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                          <span className="absolute inset-0 animate-ping rounded-full bg-success-soft" />
+                          <div className="relative inline-flex size-12 items-center justify-center rounded-full border border-success/30 bg-success-soft text-success">
                             <Radio className="size-5" />
                           </div>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-zinc-200">Listening…</p>
-                          <p className="mt-1 text-xs text-zinc-500">
+                          <p className="text-sm font-medium text-ink">Listening…</p>
+                          <p className="mt-1 text-xs text-ink-faint">
                             Send a request to your endpoint. New hits appear here live.
                           </p>
                         </div>
@@ -544,9 +544,9 @@ export function webhookBin() {
                                 className={cn(
                                   "w-full rounded-xl border px-3 py-2.5 text-left transition-all",
                                   selected
-                                    ? "border-emerald-500/40 bg-emerald-500/10"
-                                    : "border-zinc-800 bg-zinc-950 hover:border-zinc-700",
-                                  flash && "ring-1 ring-emerald-400/50",
+                                    ? "border-success/40 bg-success-soft"
+                                    : "border-line bg-sunken hover:border-line",
+                                  flash && "ring-1 ring-ring/30",
                                 )}
                               >
                                 <div className="flex items-center gap-2">
@@ -558,12 +558,12 @@ export function webhookBin() {
                                   >
                                     {hit.method}
                                   </span>
-                                  <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-zinc-400">
+                                  <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-ink-muted">
                                     {hit.path.replace(/^\/hook\/[a-f0-9]+/, "") || "/"}
                                     {hit.query ? `?${hit.query}` : ""}
                                   </span>
                                 </div>
-                                <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] text-zinc-500">
+                                <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] text-ink-faint">
                                   <span>{formatRelative(hit.receivedAt)}</span>
                                   <span>{formatBytes(hit.bodyBytes)}</span>
                                 </div>
@@ -578,12 +578,12 @@ export function webhookBin() {
 
                 <section
                   className={cn(
-                    "flex h-[24rem] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 sm:h-[28rem]",
+                    "flex h-[24rem] flex-col overflow-hidden rounded-2xl border border-line bg-sunken sm:h-[28rem]",
                     mobilePane === "detail" ? "flex" : "hidden lg:flex",
                   )}
                 >
-                  <header className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2.5">
-                    <h2 className="text-xs font-medium tracking-wide text-zinc-400 uppercase">
+                  <header className="flex shrink-0 items-center justify-between gap-2 border-b border-line px-3 py-2.5">
+                    <h2 className="text-xs font-medium tracking-wide text-ink-muted uppercase">
                       Request detail
                     </h2>
                     {detail ? (
@@ -600,12 +600,12 @@ export function webhookBin() {
                   </header>
 
                   {!detail ? (
-                    <div className="flex flex-1 items-center justify-center px-6 text-center text-sm text-zinc-500">
+                    <div className="flex flex-1 items-center justify-center px-6 text-center text-sm text-ink-faint">
                       Select a request to inspect headers, query, and body.
                     </div>
                   ) : (
                     <div className="flex min-h-0 flex-1 flex-col">
-                      <div className="shrink-0 space-y-2 border-b border-zinc-800 px-3 py-3">
+                      <div className="shrink-0 space-y-2 border-b border-line px-3 py-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={cn(
@@ -615,21 +615,21 @@ export function webhookBin() {
                           >
                             {detail.method}
                           </span>
-                          <span className="min-w-0 break-all font-mono text-xs text-zinc-300">
+                          <span className="min-w-0 break-all font-mono text-xs text-ink-muted">
                             {detail.path}
                             {detail.query ? `?${detail.query}` : ""}
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-500">
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-ink-faint">
                           <span>{new Date(detail.receivedAt).toLocaleString()}</span>
                           <span>{detail.ip}</span>
                           <span>{formatBytes(detail.bodyBytes)}</span>
                           {detail.contentType ? <span className="truncate">{detail.contentType}</span> : null}
                           {detail.bodyTruncated ? (
-                            <span className="text-amber-400">body truncated</span>
+                            <span className="text-premium-ink">body truncated</span>
                           ) : null}
                         </div>
-                        <div className="grid grid-cols-3 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1">
+                        <div className="grid grid-cols-3 gap-1 rounded-lg border border-line bg-raised p-1">
                           {(
                             [
                               { id: "body", label: "Body" },
@@ -644,8 +644,8 @@ export function webhookBin() {
                               className={cn(
                                 "rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors",
                                 detailTab === t.id
-                                  ? "bg-zinc-800 text-zinc-100"
-                                  : "text-zinc-500 hover:text-zinc-300",
+                                  ? "bg-sunken text-ink"
+                                  : "text-ink-faint hover:text-ink-muted",
                               )}
                             >
                               {t.label}
@@ -657,9 +657,9 @@ export function webhookBin() {
                       <div className="min-h-0 flex-1 overflow-auto p-3">
                         {detailTab === "body" ? (
                           pretty.language === "empty" ? (
-                            <p className="text-sm text-zinc-500">Empty body</p>
+                            <p className="text-sm text-ink-faint">Empty body</p>
                           ) : (
-                            <pre className="whitespace-pre-wrap break-all font-mono text-[11px] leading-relaxed text-zinc-300 sm:text-xs">
+                            <pre className="whitespace-pre-wrap break-all font-mono text-[11px] leading-relaxed text-ink-muted sm:text-xs">
                               {pretty.text}
                             </pre>
                           )
@@ -672,10 +672,10 @@ export function webhookBin() {
                               .map(([k, v]) => (
                                 <div
                                   key={k}
-                                  className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-2"
+                                  className="rounded-xl border border-line bg-raised px-3 py-2"
                                 >
-                                  <dt className="font-mono text-[11px] text-emerald-400/90">{k}</dt>
-                                  <dd className="mt-1 break-all font-mono text-[11px] text-zinc-300">
+                                  <dt className="font-mono text-[11px] text-success">{k}</dt>
+                                  <dd className="mt-1 break-all font-mono text-[11px] text-ink-muted">
                                     {v}
                                   </dd>
                                 </div>
@@ -685,16 +685,16 @@ export function webhookBin() {
 
                         {detailTab === "query" ? (
                           Object.keys(detail.queryParams ?? {}).length === 0 ? (
-                            <p className="text-sm text-zinc-500">No query parameters</p>
+                            <p className="text-sm text-ink-faint">No query parameters</p>
                           ) : (
                             <dl className="space-y-2">
                               {Object.entries(detail.queryParams ?? {}).map(([k, v]) => (
                                 <div
                                   key={k}
-                                  className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-2"
+                                  className="rounded-xl border border-line bg-raised px-3 py-2"
                                 >
-                                  <dt className="font-mono text-[11px] text-emerald-400/90">{k}</dt>
-                                  <dd className="mt-1 break-all font-mono text-[11px] text-zinc-300">
+                                  <dt className="font-mono text-[11px] text-success">{k}</dt>
+                                  <dd className="mt-1 break-all font-mono text-[11px] text-ink-muted">
                                     {v}
                                   </dd>
                                 </div>

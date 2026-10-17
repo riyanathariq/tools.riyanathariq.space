@@ -1,247 +1,215 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, type KeyboardEvent } from "react";
 
-import { toolsRegistry } from "@/data/tools-registry";
-import { siteConfig } from "@/lib/site";
-import { CATEGORY_LABELS, type ToolCategory, type ToolMeta } from "@/types/tool";
+import { ToolGlyph } from "@/components/tool-glyph";
+import { categoryOrder, filterTools, ToolResults } from "@/components/tool-results";
+import { getToolBySlug, toolsRegistry } from "@/data/tools-registry";
+import { useRecentTools } from "@/lib/recent-tools";
+import { cn } from "@/lib/utils";
+import { CATEGORY_LABELS, type ToolCategory } from "@/types/tool";
 
-const categoryOrder: ToolCategory[] = [
-  "cloud",
-  "encoding",
-  "crypto",
-  "ids",
-  "data",
-  "http",
-  "media",
-  "documents",
-  "indonesia",
-  "misc",
-];
-
-function matchesQuery(tool: ToolMeta, q: string) {
-  if (!q) return true;
-  const hay = [tool.name, tool.description, tool.slug, tool.category, ...tool.keywords]
-    .join(" ")
-    .toLowerCase();
-  return q
-    .toLowerCase()
-    .split(/\s+/)
-    .filter(Boolean)
-    .every((token) => hay.includes(token));
-}
-
-function SpotlightCard({
-  tool,
-  index,
-}: {
-  tool: ToolMeta;
-  index: number;
-}) {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const background = useMotionTemplate`radial-gradient(320px circle at ${mx}px ${my}px, rgba(16,185,129,0.18), transparent 55%)`;
-
-  return (
-    <motion.li
-      layout
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ delay: Math.min(index, 10) * 0.03, type: "spring", stiffness: 320, damping: 28 }}
-    >
-      <Link
-        href={`/t/${tool.slug}`}
-        className="group relative block overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 p-4 transition hover:border-emerald-500/40"
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect();
-          mx.set(e.clientX - r.left);
-          my.set(e.clientY - r.top);
-        }}
-      >
-        <motion.div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background }}
-        />
-        <div className="relative">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
-              {CATEGORY_LABELS[tool.category]}
-            </p>
-            {tool.cloud ? (
-              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] text-amber-300">
-                premium
-              </span>
-            ) : null}
-          </div>
-          <h2 className="mt-1 text-base font-medium text-white group-hover:text-emerald-200">
-            {tool.name}
-          </h2>
-          <p className="mt-1 line-clamp-2 text-sm text-zinc-500">{tool.description}</p>
-        </div>
-      </Link>
-    </motion.li>
-  );
+function isCategory(value: string | null): value is ToolCategory {
+  return value !== null && (categoryOrder as string[]).includes(value);
 }
 
 export function HomePageClient() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const rawCat = params.get("c");
+  const category: ToolCategory | "all" = isCategory(rawCat) ? rawCat : "all";
+
   const [query, setQuery] = useState("");
-  const [activeCat, setActiveCat] = useState<ToolCategory | "all">("all");
+  const [active, setActive] = useState(0);
 
-  const filtered = useMemo(() => {
-    return toolsRegistry.filter((t) => {
-      if (activeCat !== "all" && t.category !== activeCat) return false;
-      return matchesQuery(t, query.trim());
-    });
-  }, [query, activeCat]);
+  const tools = useMemo(() => filterTools(query, category), [query, category]);
+  const index = Math.min(active, Math.max(tools.length - 1, 0));
+  const filtered = query.trim() !== "" || category !== "all";
 
-  const grouped = useMemo(() => {
-    return categoryOrder
-      .map((category) => ({
-        category,
-        tools: filtered.filter((t) => t.category === category),
-      }))
-      .filter((g) => g.tools.length > 0);
-  }, [filtered]);
+  const recent = useRecentTools()
+    .map((slug) => getToolBySlug(slug))
+    .flatMap((t) => (t ? [t] : []))
+    .slice(0, 8);
+  const premium = toolsRegistry.filter((t) => t.cloud);
+
+  const selectCategory = (next: ToolCategory | "all") => {
+    router.replace(next === "all" ? "/" : `/?c=${next}`, { scroll: false });
+    setActive(0);
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive(Math.min(index + 1, tools.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive(Math.max(index - 1, 0));
+    } else if (e.key === "Enter" && tools[index]) {
+      e.preventDefault();
+      router.push(`/t/${tools[index].slug}`);
+    }
+  };
 
   return (
-    <div className="relative">
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="relative mb-8"
-      >
-        <p className="font-mono text-[11px] tracking-[0.2em] text-emerald-400/90 uppercase">
-          {siteConfig.shortName ?? "tools"} · terminal lab
+    <div>
+      <div className="mb-8">
+        <p className="font-mono text-[11px] font-medium tracking-[0.14em] text-accent uppercase">
+          tools.riyanathariq.space
         </p>
-        <h1 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
           Developer Tools
-          <span className="ml-1 inline-block h-[0.85em] w-2 translate-y-0.5 animate-pulse bg-emerald-400 align-baseline" />
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
           Free online utilities for encoding, crypto, JSON, regex, IDs, and more. Most tools run
           entirely in your browser. Premium tools need sign-in.
         </p>
-        <p className="mt-2 font-mono text-xs text-emerald-500/80">
-          {filtered.length}/{toolsRegistry.length} utilities
-          {query.trim() || activeCat !== "all" ? " matched" : " online"}
+        <p className="mt-2 font-mono text-xs text-ink-faint">
+          {tools.length}/{toolsRegistry.length} utilities{filtered ? " matched" : " online"}
         </p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08, type: "spring", stiffness: 240, damping: 24 }}
-        className="relative mb-8 rounded-2xl border border-emerald-500/20 bg-zinc-900/60 p-4"
-      >
-        <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 focus-within:border-emerald-500/40">
-          <Search className="size-4 shrink-0 text-emerald-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tools — jwt, base64, webhook…"
-            className="min-w-0 flex-1 bg-transparent text-sm text-zinc-100 outline-none placeholder:text-zinc-600"
-            autoComplete="off"
-            spellCheck={false}
-          />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              className="rounded-md p-1 text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
-              aria-label="Clear search"
-            >
-              <X className="size-3.5" />
-            </button>
-          ) : null}
-        </label>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <CategoryChip
-            label="all"
-            active={activeCat === "all"}
-            onClick={() => setActiveCat("all")}
-          />
-          {categoryOrder.map((c) => (
-            <CategoryChip
-              key={c}
-              label={CATEGORY_LABELS[c]}
-              active={activeCat === c}
-              onClick={() => setActiveCat(c)}
-            />
-          ))}
-        </div>
-      </motion.div>
-
-      {filtered.length === 0 ? (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-zinc-500"
+      <div className="flex flex-wrap items-start gap-6">
+        <section
+          aria-label="Find a tool"
+          className="min-w-0 flex-[1_1_34rem] overflow-hidden rounded-3xl border border-line bg-raised shadow-pop"
         >
-          No tools match <span className="font-mono text-zinc-300">“{query}”</span>
-          {activeCat !== "all" ? (
-            <>
-              {" "}
-              in <span className="text-zinc-300">{CATEGORY_LABELS[activeCat]}</span>
-            </>
-          ) : null}
-          . Try another keyword or clear filters.
-        </motion.p>
-      ) : (
-        <div className="space-y-10">
-          {grouped.map((group) => (
-            <section key={group.category}>
-              <h2 className="mb-3 font-mono text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">
-                {CATEGORY_LABELS[group.category]}
-                <span className="ml-2 text-zinc-600 normal-case tracking-normal">
-                  {group.tools.length}
-                </span>
-              </h2>
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <AnimatePresence mode="popLayout">
-                  {group.tools.map((tool, i) => (
-                    <SpotlightCard key={tool.slug} tool={tool} index={i} />
-                  ))}
-                </AnimatePresence>
-              </ul>
-            </section>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+          <div className="flex h-[4.5rem] items-center gap-3.5 border-b border-line px-6">
+            <Search className="size-5 shrink-0 text-accent" aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setActive(0);
+              }}
+              onKeyDown={onKeyDown}
+              placeholder="Search tools — jwt, base64, webhook…"
+              aria-label="Search tools"
+              autoComplete="off"
+              spellCheck={false}
+              className="min-w-0 flex-1 bg-transparent text-lg font-medium text-ink outline-none placeholder:text-ink-faint"
+            />
+            {query ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setActive(0);
+                }}
+                className="rounded-lg p-1.5 text-ink-faint hover:bg-sunken hover:text-ink"
+                aria-label="Clear search"
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
+          </div>
 
-function CategoryChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <motion.button
-      type="button"
-      layout
-      onClick={onClick}
-      whileTap={{ scale: 0.96 }}
-      className={
-        active
-          ? "rounded-full border border-emerald-500/50 bg-emerald-500/20 px-2.5 py-1 text-[11px] text-emerald-200"
-          : "rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-400 hover:text-zinc-200"
-      }
-    >
-      {label}
-    </motion.button>
+          <div className="flex gap-2 overflow-x-auto border-b border-line px-6 py-3">
+            {(["all", ...categoryOrder] as const).map((c) => {
+              const on = category === c;
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => selectCategory(c)}
+                  className={cn(
+                    "shrink-0 rounded-full border px-3 py-1 text-xs transition-colors",
+                    on
+                      ? "border-accent bg-accent-soft font-semibold text-accent-ink"
+                      : "border-line-strong text-ink-muted hover:bg-sunken hover:text-ink",
+                  )}
+                >
+                  {c === "all" ? "all" : CATEGORY_LABELS[c]}
+                </button>
+              );
+            })}
+          </div>
+
+          {tools.length === 0 ? (
+            <p className="px-6 py-16 text-center text-sm text-ink-muted">
+              No tools match <span className="font-mono text-ink">“{query}”</span>
+              {category !== "all" ? (
+                <>
+                  {" "}
+                  in <span className="text-ink">{CATEGORY_LABELS[category]}</span>
+                </>
+              ) : null}
+              . Try another keyword or clear filters.
+            </p>
+          ) : (
+            <ToolResults
+              idPrefix="home"
+              tools={tools}
+              activeIndex={index}
+              onHover={setActive}
+              grouped={query.trim() === ""}
+            />
+          )}
+
+          <div className="hidden gap-5 border-t border-line px-6 py-3 text-xs font-medium text-ink-muted sm:flex">
+            <span>
+              <kbd className="rounded-md bg-sunken px-1.5 py-0.5 font-mono">↑↓</kbd> navigate
+            </span>
+            <span>
+              <kbd className="rounded-md bg-sunken px-1.5 py-0.5 font-mono">↵</kbd> open
+            </span>
+            <span>
+              <kbd className="rounded-md bg-sunken px-1.5 py-0.5 font-mono">/</kbd> search anywhere
+            </span>
+          </div>
+        </section>
+
+        <aside className="flex min-w-0 flex-[1_1_18rem] flex-col gap-5 lg:sticky lg:top-[4.5rem] lg:max-w-sm">
+          <section className="rounded-2xl border border-line bg-raised p-5">
+            <h2 className="mb-3.5 font-mono text-[11px] font-medium tracking-[0.14em] text-ink-muted uppercase">
+              Recent
+            </h2>
+            {recent.length === 0 ? (
+              <p className="text-sm text-ink-muted">Tools you open show up here.</p>
+            ) : (
+              <ul className="grid grid-cols-4 gap-2">
+                {recent.map((t) => (
+                  <li key={t.slug}>
+                    <Link
+                      href={`/t/${t.slug}`}
+                      className="flex flex-col items-center gap-2 rounded-xl px-1 py-3 text-center text-xs font-medium text-ink transition-colors hover:bg-sunken"
+                    >
+                      <ToolGlyph slug={t.slug} name={t.name} premium={t.cloud} className="size-12" />
+                      <span className="line-clamp-2">{t.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="rounded-2xl border border-line bg-raised p-5">
+            <h2 className="mb-3.5 font-mono text-[11px] font-medium tracking-[0.14em] text-ink-muted uppercase">
+              Premium
+            </h2>
+            <ul className="grid grid-cols-2 gap-2">
+              {premium.map((t) => (
+                <li key={t.slug}>
+                  <Link
+                    href={`/t/${t.slug}`}
+                    className="flex flex-col items-center gap-2 rounded-xl px-1 py-3 text-center text-xs font-medium text-ink transition-colors hover:bg-sunken"
+                  >
+                    <ToolGlyph slug={t.slug} name={t.name} premium className="size-12" />
+                    {t.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+              Runs on the Go API backend. Sign in with Google to use them.
+            </p>
+          </section>
+        </aside>
+      </div>
+    </div>
   );
 }

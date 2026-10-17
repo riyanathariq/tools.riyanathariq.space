@@ -176,12 +176,12 @@ export function timezonePlanner() {
       <div className="flex flex-col gap-4">
         <Panel title="Base datetime">
           <div className="mb-3 grid gap-3 sm:grid-cols-2">
-            <label className="flex flex-col gap-1 text-xs text-zinc-500">
+            <label className="flex flex-col gap-1 text-xs text-ink-faint">
               Base timezone
               <select
                 value={baseZone}
                 onChange={(e) => setBaseZone(e.target.value)}
-                className="h-11 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
+                className="h-11 rounded-xl border border-line bg-sunken px-3 text-sm text-ink"
               >
                 {[...new Set([browserTz, ...TIMEZONE_OPTIONS])].map((z) => (
                   <option key={z} value={z}>
@@ -206,7 +206,7 @@ export function timezonePlanner() {
                 ["Minute", minute, setMinute, 0, 59],
               ] as const
             ).map(([label, value, setter, min, max]) => (
-              <label key={label} className="flex flex-col gap-1 text-xs text-zinc-500">
+              <label key={label} className="flex flex-col gap-1 text-xs text-ink-faint">
                 {label}
                 <Input
                   type="number"
@@ -218,9 +218,9 @@ export function timezonePlanner() {
               </label>
             ))}
           </div>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-ink-faint">
             Interpreting {pad2(hour)}:{pad2(minute)} on {year}-{pad2(month)}-{pad2(day)} in{" "}
-            <span className="font-mono text-zinc-400">{baseZone}</span>
+            <span className="font-mono text-ink-muted">{baseZone}</span>
           </p>
         </Panel>
 
@@ -233,7 +233,7 @@ export function timezonePlanner() {
                   if (e.target.value) addZone(e.target.value);
                   e.target.value = "";
                 }}
-                className="h-10 rounded-xl border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-100"
+                className="h-10 rounded-xl border border-line bg-sunken px-3 text-sm text-ink"
               >
                 <option value="">Add timezone…</option>
                 {availableToAdd.map((z) => (
@@ -243,13 +243,13 @@ export function timezonePlanner() {
                 ))}
               </select>
             ) : null}
-            <span className="text-xs text-zinc-500">{zones.length}/4 selected</span>
+            <span className="text-xs text-ink-faint">{zones.length}/4 selected</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[32rem] text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase">
+                <tr className="border-b border-line text-xs text-ink-faint uppercase">
                   <th className="px-3 py-2 font-medium">Timezone</th>
                   <th className="px-3 py-2 font-medium">Local time</th>
                   <th className="px-3 py-2 font-medium">Offset</th>
@@ -259,11 +259,11 @@ export function timezonePlanner() {
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.tz} className="border-b border-zinc-800/80">
-                    <td className="px-3 py-2.5 font-mono text-zinc-200">{row.tz}</td>
-                    <td className="px-3 py-2.5 text-emerald-300">{row.formatted}</td>
-                    <td className="px-3 py-2.5 font-mono text-zinc-400">{row.offset}</td>
-                    <td className="px-3 py-2.5 text-zinc-400">{row.weekday}</td>
+                  <tr key={row.tz} className="border-b border-line">
+                    <td className="px-3 py-2.5 font-mono text-ink">{row.tz}</td>
+                    <td className="px-3 py-2.5 text-success">{row.formatted}</td>
+                    <td className="px-3 py-2.5 font-mono text-ink-muted">{row.offset}</td>
+                    <td className="px-3 py-2.5 text-ink-muted">{row.weekday}</td>
                     <td className="px-3 py-2.5">
                       {zones.length > 2 ? (
                         <Button type="button" variant="ghost" className="h-8 px-2 text-xs" onClick={() => removeZone(row.tz)}>

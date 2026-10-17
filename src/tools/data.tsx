@@ -19,7 +19,7 @@ import {
 import { getToolBySlug } from "@/data/tools-registry";
 
 const textareaClass =
-  "min-h-[16rem] border-0 bg-zinc-950 p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
+  "min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
 
 function sortObjectKeys(obj: unknown): unknown {
   if (Array.isArray(obj)) return obj.map(sortObjectKeys);
@@ -103,14 +103,14 @@ const TEXT_DIFF_SAMPLE = {
 
 function DiffSidePanel({ parts, side }: { parts: ChangeObject<string>[]; side: "left" | "right" }) {
   return (
-    <pre className="max-h-[20rem] overflow-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-zinc-200">
+    <pre className="max-h-[20rem] overflow-auto whitespace-pre-wrap font-mono text-sm leading-relaxed text-ink">
       {parts.map((part, i) => {
         if (side === "left" && part.added) return null;
         if (side === "right" && part.removed) return null;
         const highlight = part.removed
-          ? "rounded bg-rose-500/25 text-rose-100"
+          ? "rounded bg-danger-soft text-danger-ink"
           : part.added
-            ? "rounded bg-emerald-500/25 text-emerald-100"
+            ? "rounded bg-success-soft text-success"
             : "";
         return (
           <span key={i} className={highlight}>
@@ -206,8 +206,8 @@ export function jsonPath() {
         description={meta?.description ?? ""}
         slug="json-path"
       />
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
-        <label className="text-sm text-zinc-400">Path</label>
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+        <label className="text-sm text-ink-muted">Path</label>
         <Input value={path} onChange={(e) => setPath(e.target.value)} placeholder="$.a.b[0]" className="max-w-md flex-1 font-mono" />
         <SampleButton
           onClick={() => {
@@ -266,7 +266,7 @@ export function regex() {
         description={meta?.description ?? ""}
         slug="regex"
       />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         <Input value={pattern} onChange={(e) => setPattern(e.target.value)} placeholder="Pattern" className="max-w-md flex-1 font-mono" />
         <Input value={flags} onChange={(e) => setFlags(e.target.value)} placeholder="Flags" className="w-24 font-mono" />
         <Button type="button" variant={mode === "match" ? "primary" : "outline"} onClick={() => setMode("match")}>
@@ -311,22 +311,22 @@ export function textDiff() {
         slug="text-diff"
       />
       <div className="flex min-h-[32rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-raised p-3">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             <input
               type="checkbox"
               checked={ignoreWhitespace}
               onChange={(e) => setIgnoreWhitespace(e.target.checked)}
-              className="accent-emerald-500"
+              className="accent-accent"
             />
             Ignore whitespace
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             <input
               type="checkbox"
               checked={ignoreCase}
               onChange={(e) => setIgnoreCase(e.target.checked)}
-              className="accent-emerald-500"
+              className="accent-accent"
             />
             Ignore case
           </label>
@@ -478,7 +478,7 @@ export function textToolkit() {
         description={meta?.description ?? ""}
         slug="text-toolkit"
       />
-      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3">
+      <div className="mb-3 flex flex-wrap gap-2 rounded-2xl border border-line bg-raised p-3">
         {(
           [
             ["stats", "Stats"],
@@ -511,9 +511,9 @@ export function textToolkit() {
           <Panel title="Statistics">
             <dl className="grid grid-cols-2 gap-4 text-sm">
               {Object.entries(stats).map(([k, v]) => (
-                <div key={k} className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 p-4">
-                  <dt className="capitalize text-zinc-500">{k}</dt>
-                  <dd className="mt-1 text-2xl font-semibold text-emerald-300">{v}</dd>
+                <div key={k} className="rounded-xl border border-line bg-raised p-4">
+                  <dt className="capitalize text-ink-faint">{k}</dt>
+                  <dd className="mt-1 text-2xl font-semibold text-success">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -547,12 +547,12 @@ export function textToolkit() {
               >
                 Exclude
               </Button>
-              <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <label className="flex items-center gap-2 text-sm text-ink-muted">
                 <input
                   type="checkbox"
                   checked={ignoreCase}
                   onChange={(e) => setIgnoreCase(e.target.checked)}
-                  className="accent-emerald-500"
+                  className="accent-accent"
                 />{" "}
                 Case-insensitive
               </label>
@@ -590,21 +590,21 @@ export function textToolkit() {
               >
                 Desc
               </Button>
-              <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <label className="flex items-center gap-2 text-sm text-ink-muted">
                 <input
                   type="checkbox"
                   checked={numeric}
                   onChange={(e) => setNumeric(e.target.checked)}
-                  className="accent-emerald-500"
+                  className="accent-accent"
                 />{" "}
                 Numeric
               </label>
-              <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <label className="flex items-center gap-2 text-sm text-ink-muted">
                 <input
                   type="checkbox"
                   checked={unique}
                   onChange={(e) => setUnique(e.target.checked)}
-                  className="accent-emerald-500"
+                  className="accent-accent"
                 />{" "}
                 Unique
               </label>
@@ -621,12 +621,12 @@ export function textToolkit() {
           options={
             <>
               {(["trim", "collapse", "dedupe"] as const).map((k) => (
-                <label key={k} className="flex items-center gap-2 text-sm capitalize text-zinc-300">
+                <label key={k} className="flex items-center gap-2 text-sm capitalize text-ink-muted">
                   <input
                     type="checkbox"
                     checked={ops[k]}
                     onChange={(e) => setOps({ ...ops, [k]: e.target.checked })}
-                    className="accent-emerald-500"
+                    className="accent-accent"
                   />{" "}
                   {k === "collapse" ? "Collapse spaces" : k}
                 </label>
@@ -718,8 +718,8 @@ export function loremIpsum() {
         slug="lorem-ipsum"
       />
       <div className="flex min-h-[20rem] flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-raised p-3">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             Paragraphs
             <Input
               type="number"
@@ -730,7 +730,7 @@ export function loremIpsum() {
               className="w-20"
             />
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             Min words
             <Input
               type="number"
@@ -741,7 +741,7 @@ export function loremIpsum() {
               className="w-20"
             />
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400">
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
             Max words
             <Input
               type="number"
