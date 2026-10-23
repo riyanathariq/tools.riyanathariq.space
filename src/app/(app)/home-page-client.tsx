@@ -107,7 +107,7 @@ export function HomePageClient() {
             ) : null}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto border-b border-line px-6 py-3">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-line px-6 py-3">
             {(["all", ...categoryOrder] as const).map((c) => {
               const on = category === c;
               return (

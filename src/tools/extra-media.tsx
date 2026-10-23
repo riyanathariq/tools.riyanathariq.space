@@ -187,7 +187,7 @@ export function svgConverter() {
             value={svg}
             onChange={(e) => setSvg(e.target.value)}
             placeholder="Paste SVG markup…"
-            className="min-h-[8rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+            className="min-h-[8rem] font-mono text-xs"
           />
           {!svg ? (
             <Button type="button" variant="outline" className="mt-2" onClick={() => setSvg(SAMPLE_SVG)}>

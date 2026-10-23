@@ -359,7 +359,7 @@ export function asciiArt() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type text…"
-            className="min-h-[12rem] border-0 bg-sunken p-0 focus:ring-0"
+            className="min-h-[12rem]"
           />
         </Panel>
         <Panel

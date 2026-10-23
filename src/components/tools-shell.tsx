@@ -11,6 +11,7 @@ import { RecentTabs } from "@/components/recent-tabs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { VisitorBeacon } from "@/components/visitor-beacon";
 import { getToolBySlug } from "@/data/tools-registry";
+import { useSearchShortcut } from "@/lib/platform";
 import { pushRecent } from "@/lib/recent-tools";
 import { cn } from "@/lib/utils";
 import { CATEGORY_LABELS } from "@/types/tool";
@@ -54,6 +55,7 @@ function RailItem({
 
 export function ToolsShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const shortcut = useSearchShortcut();
   const pathname = usePathname();
   const activeSlug = pathname?.startsWith("/t/") ? pathname.slice(3).split("/")[0] : undefined;
   const tool = activeSlug ? getToolBySlug(activeSlug) : undefined;
@@ -94,7 +96,7 @@ export function ToolsShell({ children }: { children: ReactNode }) {
         <button
           type="button"
           aria-label="Search tools"
-          title="Search tools (⌘K)"
+          title={`Search tools (${shortcut})`}
           onClick={() => setPaletteOpen(true)}
           className="inline-flex size-12 items-center justify-center rounded-xl text-ink-muted transition-colors hover:bg-sunken hover:text-ink"
         >
@@ -114,7 +116,10 @@ export function ToolsShell({ children }: { children: ReactNode }) {
             <Link
               href="/"
               aria-label="tools.riyanathariq — home"
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink font-mono text-sm font-semibold text-surface lg:hidden"
+              className={cn(
+                "size-10 shrink-0 items-center justify-center rounded-xl bg-ink font-mono text-sm font-semibold text-surface lg:hidden",
+                tool ? "hidden sm:inline-flex" : "inline-flex",
+              )}
             >
               tl
             </Link>
@@ -164,7 +169,7 @@ export function ToolsShell({ children }: { children: ReactNode }) {
                 <Search className="size-4" />
                 <span className="hidden sm:inline">Search</span>
                 <kbd className="hidden rounded-md bg-sunken px-1.5 py-0.5 font-mono text-[11px] sm:inline">
-                  ⌘K
+                  {shortcut}
                 </kbd>
               </button>
               <ThemeToggle className="size-9 lg:hidden" />

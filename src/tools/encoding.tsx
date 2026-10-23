@@ -510,7 +510,7 @@ function Base64FileTool() {
                 <Textarea
                   value={encodeOutput}
                   readOnly
-                  className="min-h-[16rem] border-0 bg-sunken p-0 focus:ring-0 lg:min-h-[20rem]"
+                  className="min-h-[16rem] lg:min-h-[20rem]"
                 />
               </Panel>
             </>
@@ -539,7 +539,7 @@ function Base64FileTool() {
               value={decodeInput}
               onChange={(e) => setDecodeInput(e.target.value)}
               placeholder="Paste Base64 or a data:…;base64, URL…"
-              className="min-h-[12rem] border-0 bg-sunken p-0 focus:ring-0"
+              className="min-h-[12rem]"
             />
           </Panel>
           {decodeError ? (

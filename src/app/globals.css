@@ -355,3 +355,10 @@ body {
 .md-preview .hljs-punctuation {
   color: var(--ink-muted);
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

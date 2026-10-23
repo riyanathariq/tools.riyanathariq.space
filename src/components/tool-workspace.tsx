@@ -133,7 +133,8 @@ export function TextIO({
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Paste input here…"
-            className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0 lg:min-h-[22rem]"
+            aria-label={inputLabel}
+            className="min-h-[16rem] lg:min-h-[22rem]"
           />
         </Panel>
         <Panel
@@ -149,7 +150,8 @@ export function TextIO({
             value={output}
             readOnly
             placeholder="Output appears here…"
-            className="min-h-[16rem] border-0 bg-transparent p-0 focus:ring-0 lg:min-h-[22rem]"
+            aria-label={outputLabel}
+            className="min-h-[16rem] lg:min-h-[22rem]"
           />
         </Panel>
       </div>

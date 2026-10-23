@@ -19,7 +19,7 @@ import {
 import { getToolBySlug } from "@/data/tools-registry";
 
 const textareaClass =
-  "min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
+  "min-h-[16rem] font-mono text-sm lg:min-h-[20rem]";
 
 function sortObjectKeys(obj: unknown): unknown {
   if (Array.isArray(obj)) return obj.map(sortObjectKeys);
@@ -765,7 +765,7 @@ export function loremIpsum() {
             </>
           }
         >
-          <Textarea value={output} readOnly className={textareaClass} />
+          <Textarea value={output} readOnly aria-label="Output" className={textareaClass} />
         </Panel>
       </div>
     </>

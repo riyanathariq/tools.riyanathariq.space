@@ -24,7 +24,7 @@ import { getToolBySlug } from "@/data/tools-registry";
 
 
 const textareaClass =
-  "min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[20rem]";
+  "min-h-[16rem] font-mono text-sm lg:min-h-[20rem]";
 
 const mdMarked = new Marked(
   markedHighlight({
@@ -609,6 +609,7 @@ export function urlParser() {
                         <tr key={i} className="border-b border-line">
                           <td className="py-2 pr-3">
                             <Input
+                              aria-label={`Parameter ${i + 1} name`}
                               value={row.key}
                               onChange={(e) => {
                                 const next = [...params];
@@ -620,6 +621,7 @@ export function urlParser() {
                           </td>
                           <td className="py-2 pr-3">
                             <Input
+                              aria-label={`Parameter ${i + 1} value`}
                               value={row.value}
                               onChange={(e) => {
                                 const next = [...params];

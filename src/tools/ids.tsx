@@ -181,7 +181,8 @@ export function uuid() {
             <Textarea
               value={generated}
               readOnly
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-success focus:ring-0"
+              aria-label="Generated IDs"
+              className="min-h-[16rem] font-mono text-success"
             />
           </Panel>
         </div>
@@ -202,7 +203,7 @@ export function uuid() {
               value={validateInput}
               onChange={(e) => setValidateInput(e.target.value)}
               placeholder="Paste UUIDs to validate…"
-              className="min-h-[10rem] border-0 bg-sunken p-0 focus:ring-0"
+              className="min-h-[10rem]"
             />
           </Panel>
           <Panel title="Results">
@@ -375,7 +376,8 @@ export function ulid() {
             <Textarea
               value={joined}
               readOnly
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-success focus:ring-0"
+              aria-label="Generated ULIDs"
+              className="min-h-[16rem] font-mono text-success"
             />
           </Panel>
         </div>
@@ -390,7 +392,7 @@ export function ulid() {
               value={validateInput}
               onChange={(e) => setValidateInput(e.target.value)}
               placeholder="Paste ULIDs to validate…"
-              className="min-h-[10rem] border-0 bg-sunken p-0 focus:ring-0"
+              className="min-h-[10rem]"
             />
           </Panel>
           <Panel title="Results">

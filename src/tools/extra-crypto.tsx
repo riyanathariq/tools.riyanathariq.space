@@ -134,7 +134,7 @@ export function certInspector() {
             value={pem}
             onChange={(e) => setPem(e.target.value)}
             placeholder="-----BEGIN CERTIFICATE-----&#10;…&#10;-----END CERTIFICATE-----"
-            className="min-h-[10rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+            className="min-h-[10rem] font-mono text-xs"
           />
         </Panel>
 
@@ -296,7 +296,7 @@ export function passwordHash() {
                 value={hash}
                 readOnly
                 placeholder="Hash appears here…"
-                className="min-h-[4rem] border-0 bg-sunken p-0 font-mono text-xs text-success focus:ring-0"
+                className="min-h-[4rem] font-mono text-xs text-success"
               />
             </Panel>
           </>
@@ -315,7 +315,7 @@ export function passwordHash() {
                 value={verifyHash}
                 onChange={(e) => setVerifyHash(e.target.value)}
                 placeholder="$2a$10$…"
-                className="min-h-[4rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[4rem] font-mono text-xs"
               />
               <Button type="button" className="mt-3" onClick={verify} disabled={loading}>
                 {loading ? "Verifying…" : "Verify"}

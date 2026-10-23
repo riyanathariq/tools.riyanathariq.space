@@ -408,7 +408,7 @@ export function qrCode() {
       </div>
       <div className="grid gap-3 lg:grid-cols-2">
         <Panel title="Text / URL">
-          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem] border-0 bg-sunken p-0 focus:ring-0" />
+          <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[8rem]" />
         </Panel>
         <Panel
           title="QR Code"

@@ -22,7 +22,7 @@ export function RecentTabs({ activeSlug }: { activeSlug?: string }) {
   return (
     <nav
       aria-label="Open tools"
-      className="flex gap-1 overflow-x-auto px-3 pt-2 sm:px-4"
+      className="no-scrollbar flex gap-1 overflow-x-auto px-3 pt-2 sm:px-4"
     >
       {tabs.map((tool) => {
         const active = tool.slug === activeSlug;

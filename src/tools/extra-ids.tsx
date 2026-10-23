@@ -228,6 +228,7 @@ export function timezonePlanner() {
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {zones.length < 4 && availableToAdd.length ? (
               <select
+                aria-label="Add timezone"
                 defaultValue=""
                 onChange={(e) => {
                   if (e.target.value) addZone(e.target.value);

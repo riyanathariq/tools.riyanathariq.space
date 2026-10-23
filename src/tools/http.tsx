@@ -273,7 +273,7 @@ export function curlExplainer() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste a curl command…"
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
+              className="min-h-[16rem] font-mono text-sm lg:min-h-[22rem]"
             />
           </Panel>
           <Panel
@@ -291,7 +291,7 @@ export function curlExplainer() {
               value={output}
               readOnly
               placeholder="Client code appears here…"
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-sm focus:ring-0 lg:min-h-[22rem]"
+              className="min-h-[16rem] font-mono text-sm lg:min-h-[22rem]"
             />
           </Panel>
         </div>

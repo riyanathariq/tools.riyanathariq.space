@@ -19,7 +19,7 @@ import { getToolBySlug } from "@/data/tools-registry";
 import { cn } from "@/lib/utils";
 
 const JWT_SAMPLE =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2HT4F6DfMuqBE1-7jCp1Aas2T6DY";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 const JWT_SAMPLE_SECRET = "your-256-bit-secret";
 
 const HASH_SAMPLES = ["hello", "The quick brown fox jumps over the lazy dog"];
@@ -635,7 +635,7 @@ export function jwt() {
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="Paste encoded JWT…"
-              className="min-h-[6rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[6rem] font-mono text-xs"
             />
           </Panel>
 
@@ -645,7 +645,7 @@ export function jwt() {
                 value={headerJson}
                 readOnly
                 placeholder="Header JSON…"
-                className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[12rem] font-mono text-xs"
               />
             </Panel>
             <Panel
@@ -656,7 +656,7 @@ export function jwt() {
                 value={payloadJson}
                 readOnly
                 placeholder="Payload JSON…"
-                className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+                className="min-h-[12rem] font-mono text-xs"
               />
               {payloadObj ? <TimeClaims payload={payloadObj} /> : null}
             </Panel>
@@ -701,7 +701,7 @@ export function jwt() {
               value={encPayload}
               onChange={(e) => setEncPayload(e.target.value)}
               placeholder='{ "sub": "1234567890" }'
-              className="min-h-[12rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[12rem] font-mono text-xs"
             />
           </Panel>
 
@@ -713,7 +713,7 @@ export function jwt() {
               value={encodedToken}
               readOnly
               placeholder="Signed token appears here…"
-              className="min-h-[6rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[6rem] font-mono text-xs"
             />
           </Panel>
         </div>
@@ -852,7 +852,7 @@ export function keyGenerator() {
               value={publicPem}
               readOnly
               placeholder="Public PEM appears here…"
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[16rem] font-mono text-xs"
             />
           </Panel>
           <Panel
@@ -870,7 +870,7 @@ export function keyGenerator() {
               value={privatePem}
               readOnly
               placeholder="Private PEM appears here…"
-              className="min-h-[16rem] border-0 bg-sunken p-0 font-mono text-xs focus:ring-0"
+              className="min-h-[16rem] font-mono text-xs"
             />
           </Panel>
         </div>
